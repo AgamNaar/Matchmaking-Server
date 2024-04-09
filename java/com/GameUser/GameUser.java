@@ -6,8 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.util.UUID;
-
 /**
  * Entity class representing a game user.
  */
@@ -16,123 +14,76 @@ import java.util.UUID;
 public class GameUser {
 
     @Id
-    private final String userID;
     private String userName;
     private String email;
+    private String password;
     private int rating;
-
-    /**
-     * Constructor to create a new GameUser with provided parameters.
-     *
-     * @param userName The user's name
-     * @param email    The user's email
-     * @param rating   The user's rating
-     */
-    public GameUser(String userName, String email, int rating) {
-        this.userID = UUID.randomUUID().toString();
-        this.userName = userName;
-        this.email = email;
-        this.rating = rating;
-    }
-
-    /**
-     * Default constructor. Generates a random userID.
-     */
-    public GameUser() {
-        userID = UUID.randomUUID().toString();
-    }
+    private String token;
 
     /**
      * Constructor to deserialize a GameUser object from JSON.
      *
-     * @param userID   The user's ID
      * @param email    The user's email
      * @param rating   The user's rating
      * @param userName The user's name
+     * @param password The user's password
      */
     @JsonCreator
-    public GameUser(@JsonProperty("userID") String userID,
-                    @JsonProperty("email") String email,
+    public GameUser(@JsonProperty("email") String email,
                     @JsonProperty("rating") int rating,
-                    @JsonProperty("userName") String userName) {
-        this.userID = UUID.randomUUID().toString();
+                    @JsonProperty("userName") String userName,
+                    @JsonProperty("password") String password,
+                    @JsonProperty("token") String token) {
         this.email = email;
         this.rating = rating;
         this.userName = userName;
+        this.password = password;
+        this.token = token;
     }
 
-    /**
-     * Getter for user ID.
-     *
-     * @return The user's ID
-     */
-    public String getUserID() {
-        return userID;
-    }
-
-    /**
-     * Getter for username.
-     *
-     * @return The user's name
-     */
     public String getUserName() {
         return userName;
     }
 
-    /**
-     * Getter for user email.
-     *
-     * @return The user's email
-     */
     public String getEmail() {
         return email;
     }
 
-    /**
-     * Getter for user rating.
-     *
-     * @return The user's rating
-     */
+    public String getPassword() {
+        return password;
+    }
+
     public int getRating() {
         return rating;
     }
 
-    /**
-     * Setter for username.
-     *
-     * @param userName The new username
-     */
+    public String getToken() {
+        return token;
+    }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
-    /**
-     * Setter for user email.
-     *
-     * @param email The new user email
-     */
     public void setEmail(String email) {
         this.email = email;
     }
 
-    /**
-     * Setter for user rating.
-     *
-     * @param rating The new user rating
-     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void setRating(int rating) {
         this.rating = rating;
     }
 
-    /**
-     * toString method overridden to provide a string representation of the GameUser object.
-     *
-     * @return String representation of the GameUser object
-     */
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public String toString() {
         return "GameUser{" +
-                "userID='" + userID + '\'' +
                 ", userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
                 ", rating=" + rating +

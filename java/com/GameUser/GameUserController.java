@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Controller class for managing game users.
+ * Controller class for managing game user operations.
  */
 @RestController
 @RequestMapping(path = "user")
@@ -14,7 +14,7 @@ public class GameUserController {
     private final GameUserService gameUserService;
 
     /**
-     * Constructor to initialize GameUserController with GameUserService.
+     * Constructor for initializing GameUserController with GameUserService.
      *
      * @param gameUserService The GameUserService instance.
      */
@@ -24,10 +24,11 @@ public class GameUserController {
     }
 
     /**
-     * Endpoint to create a new game user account.
+     * Endpoint for creating a new game user account.
      *
-     * @param gameUser The new GameUser object to create an account for.
-     * @return A ServerResponse indicating the status of the operation.
+     * @param gameUser As JSON, The GameUser object representing the account to be created.
+     * Should have userName, email, password and rating
+     * @return A ServerResponse indicating the outcome of the operation, including the user's token.
      */
     @PutMapping
     public ServerResponse createAnAccount(@RequestBody GameUser gameUser) {
@@ -35,13 +36,26 @@ public class GameUserController {
     }
 
     /**
-     * Endpoint to delete an existing game user account.
+     * Endpoint for deleting an existing game user account.
      *
-     * @param gameUser The existing GameUser object to delete the account for.
-     * @return A ServerResponse indicating the status of the operation.
+     * @param gameUser As JSON, gameUser The GameUser object representing the account to be deleted.
+     * Should have userName and password.
+     * @return A ServerResponse indicating the outcome of the operation.
      */
     @DeleteMapping
     public ServerResponse deleteAnAccount(@RequestBody GameUser gameUser) {
         return gameUserService.deleteAnAccount(gameUser);
+    }
+
+    /**
+     * Endpoint for logging into a game user account.
+     *
+     * @param gameUser As JSON, The GameUser object representing the account to be logged into.
+     * Should have userName and password.
+     * @return A ServerResponse indicating the outcome of the operation, including the user's token.
+     */
+    @GetMapping
+    public ServerResponse logIntoAccount(@RequestBody GameUser gameUser) {
+        return gameUserService.logIntoAccount(gameUser);
     }
 }
