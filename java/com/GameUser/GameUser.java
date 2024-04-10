@@ -41,6 +41,9 @@ public class GameUser {
         this.token = token;
     }
 
+    public GameUser() {
+    }
+
     public String getUserName() {
         return userName;
     }
@@ -84,9 +87,11 @@ public class GameUser {
     @Override
     public String toString() {
         return "GameUser{" +
-                ", userName='" + userName + '\'' +
+                "userName='" + userName + '\'' +
                 ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
                 ", rating=" + rating +
+                ", token='" + token + '\'' +
                 '}';
     }
 }
