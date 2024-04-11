@@ -7,11 +7,11 @@ import com.ChessGame.ChessGame;
  */
 public class OnlineChessGame extends ChessGame {
 
+    private final int gameID;
     private final String whitePlayerToken;
     private final String blackPlayerToken;
     private final String whiteUserName;
     private final String blackUserName;
-    private final int gameID;
 
     /**
      * Constructor for OnlineChessGame.

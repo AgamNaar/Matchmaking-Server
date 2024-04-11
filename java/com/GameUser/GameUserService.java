@@ -9,38 +9,41 @@ import java.util.UUID;
 
 /**
  * Service class for managing game users.
+ * This service provides functionality for creating, deleting, and logging into user accounts in the game system.
  */
 @Service
 public class GameUserService {
 
     // Error message constants
-    private static final String USER_INFO_EXISTS = "User info already exists on the server";
     private static final String WRONG_USER_INFO = "Username or password isn't correct";
+    private static final String INVALID_USER_INFO = "User info is invalid";
 
-    // Repository for accessing game user data
     private final GameUserRepository gameUserRepository;
+    private final GameUserInfoValidation gameUserInfoValidation;
 
     /**
      * Constructor for GameUserService.
      *
-     * @param gameUserRepository Repository for accessing game user data
+     * @param gameUserRepository     Repository for accessing game user data
+     * @param gameUserInfoValidation Service to validate game user info
      */
     @Autowired
-    public GameUserService(GameUserRepository gameUserRepository) {
+    public GameUserService(GameUserRepository gameUserRepository, GameUserInfoValidation gameUserInfoValidation) {
         this.gameUserRepository = gameUserRepository;
+        this.gameUserInfoValidation = gameUserInfoValidation;
     }
 
     /**
      * Method for creating a new user account.
-     * Check if user info is already in use (userName or password)
+     * Check if user info is valid, if yes create new user in DB.
      *
      * @param gameUser The GameUser object representing the account to be created
      * @return A ServerResponse indicating the outcome of the operation, including the user Token.
      */
     public ServerResponse createAnAccount(GameUser gameUser) {
-        // Verify that the new account doesn't already exist in the repository
-        if (isUserInfoAlreadyInUse(gameUser))
-            return new ServerResponse(USER_INFO_EXISTS, HttpStatus.BAD_REQUEST);
+        // Verify that new game user info is valid, and not in use in the DB
+        if (gameUserInfoValidation.isGameUserInfoInvalid(gameUser))
+            return new ServerResponse(INVALID_USER_INFO, HttpStatus.BAD_REQUEST);
 
         // Try to add the new account to the database
         try {
@@ -55,6 +58,7 @@ public class GameUserService {
 
     /**
      * Method for deleting an existing user account.
+     * Checks if the given username and password match on the DB, if yes delete the account.
      *
      * @param gameUser The GameUser object representing the account to be deleted
      * @return A ServerResponse indicating the outcome of the operation
@@ -75,15 +79,16 @@ public class GameUserService {
 
     /**
      * Method for logging into a user account.
-     * Check if the password match the userName.
+     * Check if the password match the userName according to the DB
+     * If yes, create and return new token for the player
      *
      * @param gameUser The GameUser object representing the account to log into
-     * @return A ServerResponse indicating the outcome of the operation
+     * @return A ServerResponse indicating the outcome of the operation, including user new token.
      */
     public ServerResponse logIntoAccount(GameUser gameUser) {
         // Check if the provided username and password are matching
         if (isUserInfoWrong(gameUser.getUserName(), gameUser.getPassword()))
-            return new ServerResponse(WRONG_USER_INFO, HttpStatus.BAD_REQUEST);
+            return new ServerResponse(INVALID_USER_INFO, HttpStatus.BAD_REQUEST);
 
         // Try to save the account in the database with a new token
         try {
@@ -98,21 +103,10 @@ public class GameUserService {
     }
 
     /**
-     * Checks if the user information (username and email) is already in use.
-     *
-     * @param gameUser The GameUser object to check
-     * @return true if the user information is already in use, false otherwise
-     */
-    private boolean isUserInfoAlreadyInUse(GameUser gameUser) {
-        return gameUserRepository.findByUserName(gameUser.getUserName()) != null ||
-                gameUserRepository.findByEmail(gameUser.getEmail()) != null;
-    }
-
-    /**
      * Checks if the provided username and password combination is incorrect, according to the DB.
      *
-     * @param userName        The username to check
-     * @param passwordByUser  The password provided by the user
+     * @param userName       The username to check
+     * @param passwordByUser The password provided by the user
      * @return true if the username and password combination is incorrect, false otherwise
      */
     private boolean isUserInfoWrong(String userName, String passwordByUser) {
