@@ -3,8 +3,6 @@ package com.Matchmaking;
 import com.GameUser.GameUser;
 import com.OnlineGame.OnlineChessGame;
 
-import java.util.Random;
-
 /**
  * Represents a matchmaking thread responsible for finding opponents for game users.
  * This class implements the matchmaking logic by continuously searching for suitable opponents
@@ -23,9 +21,6 @@ public class Matchmaking extends Thread {
     // Repository and monitor for matchmaking operations
     private final MatchmakingRepository matchmakingRepository;
     private final MatchmakingMonitor matchmakingMonitor;
-
-    // Random number generator
-    private final static Random random = new Random();
 
     // Newly created game and its ID
     private OnlineChessGame newGame;
@@ -88,18 +83,17 @@ public class Matchmaking extends Thread {
         }
     }
 
-
     /**
      * Creates a new game with the provided opponent and saves it.
      *
      * @param secondPlayer The opponent for the new game.
      */
     private void createAndSaveNewGame(GameUser secondPlayer) {
-        // Generate a random game ID
-        newGameID = random.nextInt();
         // Create a new online chess game
         newGame = new OnlineChessGame(firstPlayer.getToken(), secondPlayer.getToken(),
-                firstPlayer.getUserName(), secondPlayer.getUserName(), newGameID);
+                firstPlayer.getUserName(), secondPlayer.getUserName());
+
+        newGameID = newGame.getGameID();
         // Notify monitor about the new game
         synchronized (matchmakingMonitor) {
             matchmakingMonitor.notifyAll();

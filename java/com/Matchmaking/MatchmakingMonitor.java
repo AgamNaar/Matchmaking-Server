@@ -2,6 +2,7 @@ package com.Matchmaking;
 
 import com.GameUser.GameUser;
 import com.OnlineGame.OnlineChessGame;
+import com.OnlineGame.OnlineChessGameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,17 +28,21 @@ public class MatchmakingMonitor {
     private static final LinkedList<OnlineChessGame> newGamesList = new LinkedList<>();
 
     private final MatchmakingRepository matchmakingRepository;
+    private final OnlineChessGameRepository onlineChessGameRepository;
 
     private int currentMatchmaking = 0;
 
     /**
      * Constructor for MatchmakingMonitor.
      *
-     * @param matchmakingRepository The repository for matchmaking operations.
+     * @param matchmakingRepository     The repository for matchmaking operations.
+     * @param onlineChessGameRepository The repository for online chess games.
      */
     @Autowired
-    public MatchmakingMonitor(MatchmakingRepository matchmakingRepository) {
+    public MatchmakingMonitor(MatchmakingRepository matchmakingRepository,
+                              OnlineChessGameRepository onlineChessGameRepository) {
         this.matchmakingRepository = matchmakingRepository;
+        this.onlineChessGameRepository = onlineChessGameRepository;
     }
 
     /**
@@ -71,12 +76,11 @@ public class MatchmakingMonitor {
     }
 
     /**
-     * Waits for a game to be available and returns its ID.
      * This method adds the provided user to the matchmaking repository and waits until
      * notified by a newly created game. Once notified, it checks if the user has been
      * matched with an opponent by iterating through the list of newly created games.
-     * If the user is matched, it returns the ID of the game. If no match is found within
-     * the timeout, it returns a special code indicating that no match was found.
+     * If the user is matched, return the game ID of the new game and remove the game from the list.
+     * If no game is found , it returns a special code indicating that no match was found.
      *
      * @param gameUser The user waiting for a game.
      * @return The ID of the game or a special code if no match is found.
@@ -88,10 +92,9 @@ public class MatchmakingMonitor {
             matchmakingRepository.add(gameUser);
             // Wait until notified by a newly created game
             wait();
-            // Iterate through the list of new games to find if the user get matched and its game ID
+            // Iterate through the list of new games to find if the user get matched
             for (OnlineChessGame game : newGamesList) {
                 if (gameUser.getUserName().equals(game.getBlackUserName())) {
-                    // Remove the game from the list
                     newGamesList.remove(game);
                     return game.getGameID();
                 }
@@ -105,7 +108,6 @@ public class MatchmakingMonitor {
 
     /**
      * Starts a new matchmaking search and returns the ID of the newly created game.
-     * Start new matchmaking search, and wait for it to finish.
      * Once the thread finishes and a new game is created, it adds the
      * game to the list and returns its ID. If no game is found within the timeout, it
      * returns a special code indicating that no match was found.
@@ -123,9 +125,11 @@ public class MatchmakingMonitor {
             // Wait for thread to finish running
             while (matchmaking.getNewGameID() == SEARCH_NOT_FINISHED)
                 wait();
-            // Add the new game to the list and return its ID
-            newGamesList.add(matchmaking.getNewGame());
-            return matchmaking.getNewGameID();
+            // Save the new game on the repository and save it in the new game list
+            OnlineChessGame newGame = matchmaking.getNewGame();
+            onlineChessGameRepository.save(newGame);
+            newGamesList.add(newGame);
+            return newGame.getGameID();
         } finally {
             // Decrement the current matchmaking count and notify all waiting threads
             currentMatchmaking--;
