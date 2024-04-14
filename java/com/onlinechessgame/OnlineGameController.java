@@ -1,9 +1,9 @@
 package com.onlinechessgame;
 
 import com.AuthenticationService;
+import com.ServerResponse;
 import com.chessgame.ChessMove;
 import com.gameuser.GameUser;
-import com.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
  * This controller provides endpoints for managing online chess games, including submitting player moves.
  */
 @RestController
-@RequestMapping(path = "game/online/")
+@RequestMapping(path = "game/online")
 public class OnlineGameController {
 
     private final OnlineGameService chessGameService;
@@ -40,7 +40,7 @@ public class OnlineGameController {
      * @param gameID     The ID of the online chess game
      * @return A ServerResponse indicating the outcome of the move submission
      */
-    @PutMapping(path = "{gameID}")
+    @PostMapping(path = "/gameplay/{gameID}")
     public ServerResponse submitPlayerMove(@RequestBody GameUser gameUser,
                                            @RequestBody ChessMove playerMove,
                                            @PathVariable("gameID") int gameID) {

@@ -1,11 +1,14 @@
 package com.matchmaking;
 
-import com.gameuser.GameUser;
-import com.ServerResponse;
 import com.AuthenticationService;
+import com.ServerResponse;
+import com.gameuser.GameUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller class for matchmaking related operations.
@@ -39,7 +42,7 @@ public class MatchmakingController {
      * @return A server response indicating success or failure of the matchmaking process.
      * If successful, return the game ID of the match that was found.
      */
-    @GetMapping
+    @PostMapping(path = "/find")
     public ServerResponse findOnlineMatch(@RequestBody GameUser gameUser) {
         // Check if the user have a valid token
         if (userAuthentication.isValidToken(gameUser))
