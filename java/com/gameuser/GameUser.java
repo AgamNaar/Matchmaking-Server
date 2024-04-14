@@ -1,4 +1,4 @@
-package com.GameUser;
+package com.gameuser;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

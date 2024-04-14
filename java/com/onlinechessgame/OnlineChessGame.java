@@ -1,6 +1,6 @@
-package com.OnlineGame;
+package com.onlinechessgame;
 
-import com.ChessGame.ChessGame;
+import com.chessgame.ChessGame;
 import jakarta.persistence.*;
 
 /**

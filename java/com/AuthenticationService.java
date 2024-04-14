@@ -1,9 +1,9 @@
 package com;
 
-import com.GameUser.GameUser;
-import com.GameUser.GameUserRepository;
-import com.OnlineGame.OnlineChessGame;
-import com.OnlineGame.OnlineChessGameRepository;
+import com.gameuser.GameUser;
+import com.gameuser.GameUserRepository;
+import com.onlinechessgame.OnlineChessGame;
+import com.onlinechessgame.OnlineChessGameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

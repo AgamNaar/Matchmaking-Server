@@ -1,4 +1,4 @@
-package com.GameUser;
+package com.gameuser;
 
 import com.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;

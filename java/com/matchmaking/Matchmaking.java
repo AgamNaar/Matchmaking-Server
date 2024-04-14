@@ -1,7 +1,7 @@
-package com.Matchmaking;
+package com.matchmaking;
 
-import com.GameUser.GameUser;
-import com.OnlineGame.OnlineChessGame;
+import com.gameuser.GameUser;
+import com.onlinechessgame.OnlineChessGame;
 
 /**
  * Represents a matchmaking thread responsible for finding opponents for game users.

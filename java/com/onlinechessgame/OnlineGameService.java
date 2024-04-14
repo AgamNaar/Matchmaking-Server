@@ -1,7 +1,7 @@
-package com.OnlineGame;
+package com.onlinechessgame;
 
-import com.ChessGame.ChessMove;
-import com.GameUser.GameUser;
+import com.chessgame.ChessMove;
+import com.gameuser.GameUser;
 import com.ServerResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

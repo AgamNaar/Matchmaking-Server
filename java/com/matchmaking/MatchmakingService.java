@@ -1,7 +1,7 @@
-package com.Matchmaking;
+package com.matchmaking;
 
-import com.GameUser.GameUser;
-import com.GameUser.GameUserRepository;
+import com.gameuser.GameUser;
+import com.gameuser.GameUserRepository;
 import com.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

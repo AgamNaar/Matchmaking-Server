@@ -1,6 +1,6 @@
-package com.Matchmaking;
+package com.matchmaking;
 
-import com.GameUser.GameUser;
+import com.gameuser.GameUser;
 import org.springframework.stereotype.Repository;
 
 import java.util.LinkedList;

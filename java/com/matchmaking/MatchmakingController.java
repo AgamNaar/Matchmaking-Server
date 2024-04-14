@@ -1,6 +1,6 @@
-package com.Matchmaking;
+package com.matchmaking;
 
-import com.GameUser.GameUser;
+import com.gameuser.GameUser;
 import com.ServerResponse;
 import com.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;

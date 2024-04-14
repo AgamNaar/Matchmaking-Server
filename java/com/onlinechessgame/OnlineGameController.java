@@ -1,8 +1,8 @@
-package com.OnlineGame;
+package com.onlinechessgame;
 
 import com.AuthenticationService;
-import com.ChessGame.ChessMove;
-import com.GameUser.GameUser;
+import com.chessgame.ChessMove;
+import com.gameuser.GameUser;
 import com.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

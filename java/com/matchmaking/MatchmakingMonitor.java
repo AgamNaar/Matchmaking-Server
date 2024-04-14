@@ -1,8 +1,8 @@
-package com.Matchmaking;
+package com.matchmaking;
 
-import com.GameUser.GameUser;
-import com.OnlineGame.OnlineChessGame;
-import com.OnlineGame.OnlineChessGameRepository;
+import com.gameuser.GameUser;
+import com.onlinechessgame.OnlineChessGame;
+import com.onlinechessgame.OnlineChessGameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
