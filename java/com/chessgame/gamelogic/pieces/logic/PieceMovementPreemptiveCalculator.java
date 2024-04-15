@@ -1,7 +1,6 @@
 package com.chessgame.gamelogic.pieces.logic;
 
 import com.chessgame.gamelogic.GameLogicUtilities;
-import com.chessgame.gamelogic.MovementData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,8 +53,8 @@ public class PieceMovementPreemptiveCalculator {
      * @param rookMoves   A list to store rook moves.
      * @param bishopMoves A list to store bishop moves.
      */
-    public void generateLinePieceMoves(ArrayList<HashMap<Long, MovementData>> rookMoves,
-                                       ArrayList<HashMap<Long, MovementData>> bishopMoves) {
+    public void generateLinePieceMoves(ArrayList<HashMap<Long, Long>> rookMoves,
+                                       ArrayList<HashMap<Long, Long>> bishopMoves) {
         generateAllMovesLinePiece(rookMoves, bishopMoves);
     }
 
@@ -153,8 +152,8 @@ public class PieceMovementPreemptiveCalculator {
      * @param moveListRook   An ArrayList to store generated moves for rooks.
      * @param moveListBishop An ArrayList to store generated moves for bishops.
      */
-    private void generateAllMovesLinePiece(ArrayList<HashMap<Long, MovementData>> moveListRook,
-                                           ArrayList<HashMap<Long, MovementData>> moveListBishop) {
+    private void generateAllMovesLinePiece(ArrayList<HashMap<Long, Long>> moveListRook,
+                                           ArrayList<HashMap<Long, Long>> moveListBishop) {
         // Iterate over all squares on the board
         for (byte pieceSquare = 0; pieceSquare < GameLogicUtilities.BOARD_SIZE; pieceSquare++) {
             // Iterate over each possible combination of row and column values
@@ -165,9 +164,9 @@ public class PieceMovementPreemptiveCalculator {
                     long bishopMap = pieceLogicUtilities.toBitMapBishop(pieceSquare, rowValue, columnValue);
 
                     // Generate moves for rooks and bishops
-                    MovementData movesRook = generateMovesLinePiece(pieceSquare, ROOK_OFFSETS, rookMap,
+                    Long movesRook = generateMovesLinePiece(pieceSquare, ROOK_OFFSETS, rookMap,
                             pieceLogicUtilities.getDistanceTillEdgeOfBoard(pieceSquare));
-                    MovementData movesBishop = generateMovesLinePiece(pieceSquare, BISHOP_OFFSETS, bishopMap,
+                    Long movesBishop = generateMovesLinePiece(pieceSquare, BISHOP_OFFSETS, bishopMap,
                             pieceLogicUtilities.getDistanceTillEdgeOfBoardBishop(pieceSquare));
 
                     // Store the generated moves for rooks and bishops in the respective lists
@@ -188,12 +187,10 @@ public class PieceMovementPreemptiveCalculator {
      * @param movesTillEdge An array representing the number of possible moves until the edge of the board in each direction.
      * @return A MovementData object containing the generated moves and the count of moves.
      */
-    private MovementData generateMovesLinePiece(byte pieceSquare, byte[] offsetArray, long bitBoard,
-                                                byte[] movesTillEdge) {
+    private Long generateMovesLinePiece(byte pieceSquare, byte[] offsetArray, long bitBoard,
+                                        byte[] movesTillEdge) {
         // Calculate the bit representing the piece's current position
         long positionBit = GameLogicUtilities.squareAsBitBoard(pieceSquare), result = 0;
-        // Initialize a counter for the number of moves
-        int counter = 0;
 
         // Iterate over each predefined offset
         for (byte i = 0; i < offsetArray.length; i++) {
@@ -206,18 +203,15 @@ public class PieceMovementPreemptiveCalculator {
                 if ((currentBit & bitBoard) != 0) {
                     // If occupied, add the current bit to the result and increment the counter
                     result |= currentBit;
-                    counter++;
                     // Break the loop as the piece cannot move beyond this square
                     break;
                 } else {
-                    // If empty, add the current bit to the result and increment the counter
-                    counter++;
+                    // If empty, add the current bit to the result
                     result |= currentBit;
                 }
             }
         }
-        // Return a MovementData object containing the generated moves and the count of moves
-        return new MovementData(result, counter);
+        return result;
     }
 
 

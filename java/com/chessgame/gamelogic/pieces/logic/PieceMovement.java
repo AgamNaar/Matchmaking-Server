@@ -1,7 +1,6 @@
 package com.chessgame.gamelogic.pieces.logic;
 
 import com.chessgame.gamelogic.GameLogicUtilities;
-import com.chessgame.gamelogic.MovementData;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,8 +23,8 @@ public class PieceMovement {
 
     // Static arrays to store pre-calculated movements for pieces
     private static final long[] KING_MOVES = new long[GameLogicUtilities.BOARD_SIZE];
-    private static final ArrayList<HashMap<Long, MovementData>> ROOK_MOVES = new ArrayList<>();
-    private static final ArrayList<HashMap<Long, MovementData>> BISHOP_MOVES = new ArrayList<>();
+    private static final ArrayList<HashMap<Long, Long>> ROOK_MOVES = new ArrayList<>();
+    private static final ArrayList<HashMap<Long, Long>> BISHOP_MOVES = new ArrayList<>();
     private static final long[] KNIGHT_MOVES = new long[GameLogicUtilities.BOARD_SIZE];
     private static final long[] WHITE_PAWN_ONLY_MOVES = new long[GameLogicUtilities.BOARD_SIZE];
     private static final long[] WHITE_PAWN_CAPTURE = new long[GameLogicUtilities.BOARD_SIZE];
@@ -99,7 +98,7 @@ public class PieceMovement {
      */
     public long getRookMovement(byte piecePosition, long allPiecesBitBoard, long sameColorPieceBitBoard) {
         long keyVal = PieceLogicUtilities.ROOK_MASK[piecePosition] & allPiecesBitBoard;
-        long moves = ROOK_MOVES.get(piecePosition).get(keyVal).bitBoardMovement;
+        long moves = ROOK_MOVES.get(piecePosition).get(keyVal);
         return moves & ~sameColorPieceBitBoard;
     }
 
@@ -113,7 +112,7 @@ public class PieceMovement {
      */
     public long getBishopMovement(byte piecePosition, long allPiecesBitBoard, long sameColorPieceBitBoard) {
         long keyVal = PieceLogicUtilities.BISHOP_MASK[piecePosition] & allPiecesBitBoard;
-        long moves = BISHOP_MOVES.get(piecePosition).get(keyVal).bitBoardMovement;
+        long moves = BISHOP_MOVES.get(piecePosition).get(keyVal);
         return moves & ~sameColorPieceBitBoard;
     }
 
