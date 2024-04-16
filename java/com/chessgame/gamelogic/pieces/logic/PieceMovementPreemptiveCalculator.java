@@ -227,9 +227,9 @@ public class PieceMovementPreemptiveCalculator {
         byte targetSquare = (byte) (pieceSquare + offset);
 
         // Get the column and row indices of the current square and the target square
-        int currX = GameLogicUtilities.getColOfSquare(pieceSquare),
+        int currX = pieceLogicUtilities.getColumnOfSquare(pieceSquare),
                 currY = GameLogicUtilities.getRowOfSquare(pieceSquare),
-                targetX = GameLogicUtilities.getColOfSquare(targetSquare),
+                targetX = pieceLogicUtilities.getColumnOfSquare(targetSquare),
                 targetY = GameLogicUtilities.getRowOfSquare(targetSquare);
 
         // Calculate the absolute differences in column and row indices (dx and dy)

@@ -1,6 +1,6 @@
 package com.chessgame.gamelogic.specialmoves;
 
-import com.chessgame.gamelogic.ChessGame;
+import com.chessgame.ChessGame;
 import com.chessgame.gamelogic.GameLogicUtilities;
 import com.chessgame.gamelogic.pieces.*;
 

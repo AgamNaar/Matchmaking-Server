@@ -12,11 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Color: color of the piece (true for white, false for black)
  * Square: square of the piece on the board
  */
-public abstract class Piece implements Cloneable {
+public abstract class Piece {
     private byte square;
     private final boolean color;
 
-    // Static fields to hold references to PieceMovement and PieceThreateningLine instances
     protected PieceMovement pieceMovement;
     protected PieceThreateningLine threateningLine;
 
@@ -79,28 +78,40 @@ public abstract class Piece implements Cloneable {
         return GameLogicUtilities.squareAsBitBoard(square);
     }
 
+    /**
+     * Retrieves the square where the piece is located.
+     *
+     * @return The square where the piece is located as a byte value.
+     */
     public byte getSquare() {
         return square;
     }
 
+    /**
+     * Sets the square where the piece is located.
+     *
+     * @param square The square to set where the piece is located.
+     */
     public void setSquare(byte square) {
         this.square = square;
     }
 
+    /**
+     * Retrieves the color of the piece.
+     *
+     * @return The color of the piece (true for white, false for black).
+     */
     public boolean getColor() {
         return color;
     }
 
-    @Override
-    public Piece clone() {
-        try {
-            return (Piece) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
-
+    /**
+     * Retrieves the piece movement details.
+     *
+     * @return The piece movement details.
+     */
     public PieceMovement getPieceMovement() {
         return pieceMovement;
     }
+
 }

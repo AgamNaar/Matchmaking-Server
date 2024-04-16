@@ -88,7 +88,7 @@ public class PieceLogicUtilities {
      * @return A bitmap representing the attack path of the rook
      */
     public long toBitMapRook(byte square, long rowValue, long columnValue) {
-        int row = GameLogicUtilities.getRowOfSquare(square), column = GameLogicUtilities.getColOfSquare(square);
+        int row = GameLogicUtilities.getRowOfSquare(square), column = getColumnOfSquare(square);
         long rowMask = rowValue << (BOARD_EDGE_SIZE * row), columnMask = 0;
 
         // Construct row mask
@@ -148,6 +148,16 @@ public class PieceLogicUtilities {
     }
 
     /**
+     * Given a square, returns its column number.
+     *
+     * @param square The square number (0 to 63).
+     * @return The column number of the square.
+     */
+    public int getColumnOfSquare(byte square) {
+        return square % BOARD_EDGE_SIZE;
+    }
+
+    /**
      * Extract a bit from a long value at a given position.
      *
      * @param position The position of the bit to extract
@@ -157,4 +167,5 @@ public class PieceLogicUtilities {
     private long extractBit(long position, long val) {
         return (val & (1L << position)) >>> position;
     }
+
 }
