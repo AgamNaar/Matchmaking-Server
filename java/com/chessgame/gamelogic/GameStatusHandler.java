@@ -1,7 +1,9 @@
 package com.chessgame.gamelogic;
 
 import com.chessgame.ChessGame;
+import com.chessgame.ChessMove;
 import com.chessgame.gamelogic.pieces.Piece;
+import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 
@@ -11,6 +13,7 @@ import java.util.LinkedList;
  * according to the moves played. It tracks the list of moves, checks for repetitive moves leading to a draw,
  * determines if a player has legal moves to play, and identifies whether a player's king is in check.
  */
+@Component
 public class GameStatusHandler {
 
     // Constants defining different game stages
@@ -22,7 +25,7 @@ public class GameStatusHandler {
     // Flag indicating whether a repetition of moves has occurred
     private boolean repetition = false;
     // List of moves played in the game
-    LinkedList<PieceMove> listOfMoves = new LinkedList<>();
+    LinkedList<ChessMove> listOfMoves = new LinkedList<>();
 
     /**
      * Updates game status and game stage according to the move played and status of the game.
@@ -31,7 +34,7 @@ public class GameStatusHandler {
      * @param game       The instance of the chess game.
      * @return The current game status (NORMAL, CHECK, DRAW, CHECKMATE).
      */
-    public int afterTurnHandler(PieceMove movePlayed, ChessGame game) {
+    public int afterTurnHandler(ChessMove movePlayed, ChessGame game) {
         listOfMoves.add(movePlayed);
         boolean doesPlayerHaveMove = doesPlayerHasLegalMovesToPlay(game.getPlayerToPlay(), game);
 
@@ -58,7 +61,7 @@ public class GameStatusHandler {
      * @param movePlayed The move played in the current turn.
      * @return True if a repetition of moves has occurred, otherwise false.
      */
-    private boolean isRepetitionOfMoves(PieceMove movePlayed) {
+    private boolean isRepetitionOfMoves(ChessMove movePlayed) {
         int listSize = listOfMoves.size();
         int currSquare = movePlayed.getCurrentPieceSquare();
         int targetSquare = movePlayed.getTargetSquare();
@@ -68,8 +71,8 @@ public class GameStatusHandler {
             return false;
 
         // Get the second last turn and the third last turn of the player who just played
-        PieceMove prevMove = listOfMoves.get(listSize - 5);
-        PieceMove prevPrevMove = listOfMoves.get(listSize - 9);
+        ChessMove prevMove = listOfMoves.get(listSize - 5);
+        ChessMove prevPrevMove = listOfMoves.get(listSize - 9);
 
         // Check if the player has repeated the same move twice
         if (currSquare == prevMove.getCurrentPieceSquare() && currSquare == prevPrevMove.getCurrentPieceSquare()
@@ -117,17 +120,5 @@ public class GameStatusHandler {
     public boolean isPlayerChecked(ChessGame game) {
         // Check if king is on one of the squares threatened by enemy pieces
         return (game.getCurrentPlayerKing().getSquareAsBitBoard() & game.getBitBoardOfSquaresThreatenByEnemy()) != 0;
-    }
-
-    /**
-     * Initializes the game status handler.
-     *
-     * @param game The instance of the chess game.
-     */
-    public void initialize(ChessGame game) {
-        // Handle the first turn (empty move) to initialize the game
-        afterTurnHandler(new PieceMove(), game);
-        // Clear the list of moves
-        listOfMoves.clear();
     }
 }

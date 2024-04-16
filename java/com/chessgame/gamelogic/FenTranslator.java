@@ -1,8 +1,13 @@
 package com.chessgame.gamelogic;
 
+import com.chessgame.ChessGame;
 import com.chessgame.gamelogic.pieces.*;
+import com.chessgame.gamelogic.specialmoves.SpecialMovesHandler;
+import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
+
+import static com.chessgame.gamelogic.specialmoves.PawnSpecialMoves.NO_EN_PASSANT_TARGET_SQUARE;
 
 /**
  * Forsyth–Edwards Notation (FEN) is a standard notation for describing a particular board position of a chess game.
@@ -15,10 +20,11 @@ import java.util.LinkedList;
  * 5. Half move clock (not extracted because not implemented).
  * 6. Full move clock (not extracted because not implemented).
  */
+@Component
 public class FenTranslator {
 
     // Standard FEN representing the initial chessboard setup
-    private static final String CLASSIC_START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
+    private static final String CLASSIC_FEN_START = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
 
     // Constants representing the characters used in FEN notation
     private static final int KING = 'k';
@@ -27,7 +33,6 @@ public class FenTranslator {
     private static final int KNIGHT = 'n';
     private static final int BISHOP = 'b';
     private static final int PAWN = 'p';
-    private static final int UPPER_CASE_OFFSET = 32;
 
     private static final char EMPTY = '-';
     private static final char WHITE_TURN = 'w';
@@ -36,108 +41,36 @@ public class FenTranslator {
     private static final String SHORT_CASTLE_BLACK = "q";
     private static final String LONG_CASTLE_BLACK = "k";
 
-    // Fields to store extracted FEN information
-    private final String fenStringValue;
-    private boolean whiteTurnToPlay;
-    private boolean whiteShortCastle;
-    private boolean whiteLongCastle;
-    private boolean blackShortCastle;
-    private boolean blackLongCastle;
-    private byte enPassantTargetSquare;
-    private final LinkedList<Piece> pieceList = new LinkedList<>();
-
-    /**
-     * Constructor that initializes a FenTranslator object using the classical chess starting position as its FEN.
-     * It translates the FEN and extracts all the relevant information.
-     */
-    public FenTranslator() {
-        fenStringValue = CLASSIC_START_FEN;
-        translateFen();
-    }
-
-    /**
-     * Constructor that initializes a FenTranslator object using a provided FEN string.
-     * It assumes the provided FEN string is valid and translates it, extracting all the relevant information.
-     *
-     * @param fenStringValue The FEN string representing a particular board position.
-     */
-    public FenTranslator(String fenStringValue) {
-        this.fenStringValue = fenStringValue;
-        translateFen();
-    }
-
-
     /**
      * Translates the FEN string and extracts all the relevant information from it.
      * It sequentially calls methods to extract piece placement, determine player turn,
      * extract castling rights, and extract en passant target square.
      */
-    private void translateFen() {
+    public void translateFen(ChessGame game, String fenStringValue) {
+        if (fenStringValue == null || fenStringValue.isEmpty())
+            fenStringValue = CLASSIC_FEN_START;
         int indexPosition = 0;
-        indexPosition = extractPiecePlacement(indexPosition);
-        whiteTurnToPlay = fenStringValue.charAt(indexPosition) == WHITE_TURN;
+        indexPosition = extractPiecePlacement(game, fenStringValue, indexPosition);
+        game.setColorOfPlayersTurn(fenStringValue.charAt(indexPosition) == WHITE_TURN);
         indexPosition = indexPosition + 2; // Skip space and move to castling rights section
-        indexPosition = extractCastling(indexPosition);
-        extractEnPassant(indexPosition);
+        extractSpecialMoves(game, fenStringValue, indexPosition);
     }
-
-
-    /**
-     * Extracts the value of the target en passant square from the FEN string.
-     * If no en passant target square is specified, the value remains uninitialized (0).
-     *
-     * @param indexPosition The index position indicating the start of the en passant section in the FEN string.
-     */
-    private void extractEnPassant(int indexPosition) {
-        if (fenStringValue.charAt(indexPosition) != EMPTY) {
-            // Convert chess square (e.g., c3, a4, etc.) to numeric square
-            int column = fenStringValue.charAt(indexPosition++) - 'h';
-            int row = Character.getNumericValue(fenStringValue.charAt(indexPosition));
-            // Calculate the numerical representation of the en passant target square
-            enPassantTargetSquare = (byte) (column + (row * GameLogicUtilities.BOARD_EDGE_SIZE));
-        }
-    }
-
-
-    /**
-     * Extracts the castling rights for each player from the FEN string.
-     * It checks the substring representing castling rights and sets corresponding boolean variables.
-     * The method returns the index position after the castling rights section in the FEN string.
-     *
-     * @param indexPosition The index position indicating the start of the castling rights section in the FEN string.
-     * @return The index position after the castling rights section.
-     */
-    private int extractCastling(int indexPosition) {
-        StringBuilder subFenString = new StringBuilder();
-        if (fenStringValue.charAt(indexPosition) != EMPTY) {
-            // Get the substring containing the values of castling rights
-            while (fenStringValue.charAt(indexPosition) != ' ') {
-                subFenString.append(fenStringValue.charAt(indexPosition));
-                indexPosition++;
-            }
-
-            // Check each letter (K, Q, k, q) representing a castling right and set corresponding booleans
-            whiteShortCastle = subFenString.toString().contains(SHORT_CASTLE_WHITE);
-            whiteLongCastle = subFenString.toString().contains(LONG_CASTLE_WHITE);
-            blackShortCastle = subFenString.toString().contains(SHORT_CASTLE_BLACK);
-            blackLongCastle = subFenString.toString().contains(LONG_CASTLE_BLACK);
-        }
-        return ++indexPosition;
-    }
-
 
     /**
      * Extracts pieces from the FEN string along with their type, color, and position, and saves them as a list.
      * It iterates through the piece placement section of the FEN string, starting from the top-left square (square 64)
      * and moving downwards. Each character in the section represents a piece or empty square, and '/' indicates
-     * the end of a row. The method returns the index position after the piece placement section in the FEN string.
+     * the end of a row. Each time it adds a new piece to the list accordingly.
+     * The method returns the index position after the piece placement section in the FEN string.
      *
-     * @param indexPosition The index position indicating the start of the piece placement section in the FEN string.
+     * @param game           The ChessGame object to which the extracted pieces will be added.
+     * @param fenStringValue The FEN string representing the board state.
+     * @param indexPosition  The index position indicating the start of the piece placement section in the FEN string.
      * @return The index position after the piece placement section.
      */
-    private int extractPiecePlacement(int indexPosition) {
+    private int extractPiecePlacement(ChessGame game, String fenStringValue, int indexPosition) {
         int square = GameLogicUtilities.BOARD_SIZE - 1;
-
+        LinkedList<Piece> pieceList = new LinkedList<>();
         // Iterate through the entire section of the FEN that represents the piece positions
         // It starts with square 64 (top-left square), and each character indicates a piece or an empty square.
         // A number represents an empty square, and '/' indicates the end of a row.
@@ -150,105 +83,84 @@ public class FenTranslator {
             else if (currChar != '/') {
                 // If it's a piece, determine its FEN type, and if it's uppercase, it's white; otherwise, it's black
                 if (Character.isUpperCase(currChar))
-                    insertFenCharIntoBitBoards(currChar, (byte) square, GameLogicUtilities.WHITE);
+                    pieceList.add(createPieceFromFenChar(currChar, (byte) square, GameLogicUtilities.WHITE));
                 else
-                    insertFenCharIntoBitBoards(currChar, (byte) square, GameLogicUtilities.BLACK);
+                    pieceList.add(createPieceFromFenChar(currChar, (byte) square, GameLogicUtilities.BLACK));
                 square--;
             }
             indexPosition++;
         }
+        game.setPieceList(pieceList);
         return ++indexPosition;
     }
 
-
     /**
-     * Adds the current piece to the list, with the corresponding type, square, and color.
-     * It determines the type of the piece based on the provided FEN type and whether it's uppercase (white) or lowercase (black).
-     * The method creates a new instance of the corresponding Piece subclass and adds it to the piece list.
+     * Creates a chess piece object from a FEN (Forsyth-Edwards Notation) character representation.
+     * It determines the type of the piece based on the provided FEN type
+     * and whether it's uppercase (white) or lowercase (black).
      *
-     * @param fenType The FEN representation of the piece type (e.g., 'K' for white king, 'k' for black king).
-     * @param square  The square on the chessboard where the piece is located.
-     * @param color   The color of the piece (true for white, false for black).
+     * @param fenChar The FEN character representing the type of chess piece.
+     * @param square  The square index on the chessboard where the piece is located.
+     * @param color   The color of the chess piece, true for white, false for black.
+     * @return A Piece object corresponding to the given FEN character and color.
      */
-    private void insertFenCharIntoBitBoards(int fenType, byte square, boolean color) {
-        Piece currentPiece = null;
-        // If the piece is white, convert uppercase FEN type to lowercase to match the piece representation
-        fenType = color ? fenType + UPPER_CASE_OFFSET : fenType;
-        // Determine the type of piece based on the FEN type and create a new instance of the corresponding subclass
+    private Piece createPieceFromFenChar(char fenChar, byte square, boolean color) {
+        Piece newPiece = null;
+        // If the piece is white, convert uppercase FEN char to lowercase to match the piece representation
+        int fenType = color ? Character.toLowerCase(fenChar) : fenChar;
+        // Determine the type of piece based on the FEN char and create a new instance of the corresponding subclass
         switch (fenType) {
-            case KING -> currentPiece = new King(square, color);
-            case QUEEN -> currentPiece = new Queen(square, color);
-            case ROOK -> currentPiece = new Rook(square, color);
-            case BISHOP -> currentPiece = new Bishop(square, color);
-            case KNIGHT -> currentPiece = new Knight(square, color);
-            case PAWN -> currentPiece = new Pawn(square, color);
+            case KING -> newPiece = new King(square, color);
+            case QUEEN -> newPiece = new Queen(square, color);
+            case ROOK -> newPiece = new Rook(square, color);
+            case BISHOP -> newPiece = new Bishop(square, color);
+            case KNIGHT -> newPiece = new Knight(square, color);
+            case PAWN -> newPiece = new Pawn(square, color);
         }
-        // Add the created piece to the piece list
-        pieceList.add(currentPiece);
+        return newPiece;
     }
 
 
     /**
-     * Checks if it is white's turn to play.
+     * Extracts special moves information from the FEN (Forsyth-Edwards Notation) string and sets it in the chess game.
+     * Extract the castling rights, and the en-passant square.
      *
-     * @return true if it is white's turn to play, false otherwise.
+     * @param game           The ChessGame object to set the extracted special moves information.
+     * @param fenStringValue The FEN string representing the current state of the chess game.
+     * @param indexPosition  The index position in the FEN string from where to start extracting special moves.
      */
-    public boolean isWhiteTurnToPlay() {
-        return whiteTurnToPlay;
-    }
-
-    /**
-     * Checks if white can perform a short castling.
-     *
-     * @return true if white can perform a short castling, false otherwise.
-     */
-    public boolean canWhiteShortCastle() {
-        return whiteShortCastle;
-    }
-
-    /**
-     * Checks if white can perform a long castling.
-     *
-     * @return true if white can perform a long castling, false otherwise.
-     */
-    public boolean canWhiteLongCastle() {
-        return whiteLongCastle;
-    }
-
-    /**
-     * Checks if black can perform a short castling.
-     *
-     * @return true if black can perform a short castling, false otherwise.
-     */
-    public boolean canBlackShortCastle() {
-        return blackShortCastle;
-    }
-
-    /**
-     * Checks if black can perform a long castling.
-     *
-     * @return true if black can perform a long castling, false otherwise.
-     */
-    public boolean canBlackLongCastle() {
-        return blackLongCastle;
-    }
-
-    /**
-     * Retrieves the en passant target square.
-     *
-     * @return The en passant target square as a byte value.
-     */
-    public byte getEnPassantSquareToCapture() {
-        return enPassantTargetSquare;
-    }
-
-    /**
-     * Retrieves the list of pieces extracted from the FEN string.
-     *
-     * @return The list of pieces on the chessboard.
-     */
-    public LinkedList<Piece> getPieceList() {
-        return pieceList;
+    private void extractSpecialMoves(ChessGame game, String fenStringValue, int indexPosition) {
+        boolean whiteShortCastle = false, whiteLongCastle = false, blackShortCastle = false, blackLongCastle = false;
+        byte enPassantTargetSquare;
+        StringBuilder subFenString = new StringBuilder();
+        if (fenStringValue.charAt(indexPosition) != EMPTY) {
+            // Get the substring containing the values of castling rights
+            while (fenStringValue.charAt(indexPosition) != ' ') {
+                subFenString.append(fenStringValue.charAt(indexPosition));
+                indexPosition++;
+            }
+            // Check each letter (K, Q, k, q) representing a castling right and set corresponding booleans
+            whiteShortCastle = subFenString.toString().contains(SHORT_CASTLE_WHITE);
+            whiteLongCastle = subFenString.toString().contains(LONG_CASTLE_WHITE);
+            blackShortCastle = subFenString.toString().contains(SHORT_CASTLE_BLACK);
+            blackLongCastle = subFenString.toString().contains(LONG_CASTLE_BLACK);
+        }
+        indexPosition++;
+        // Extract the en-passant square
+        if (fenStringValue.charAt(indexPosition) != EMPTY) {
+            // Convert chess square (e.g., c3, a4, etc.) to numeric square
+            int column = fenStringValue.charAt(indexPosition++) - 'h';
+            int row = Character.getNumericValue(fenStringValue.charAt(indexPosition));
+            // Calculate the numerical representation of the en passant target square
+            enPassantTargetSquare = (byte) (column + (row * GameLogicUtilities.BOARD_EDGE_SIZE));
+        } else {
+            enPassantTargetSquare = NO_EN_PASSANT_TARGET_SQUARE;
+        }
+        game.setSpecialMovesHandler(new SpecialMovesHandler(whiteShortCastle,
+                whiteLongCastle,
+                blackShortCastle,
+                blackLongCastle,
+                enPassantTargetSquare));
     }
 
 

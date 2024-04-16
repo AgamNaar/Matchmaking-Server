@@ -18,7 +18,7 @@ public class PawnSpecialMoves {
     private byte enPassantTargetSquare;
 
     // Constants representing special conditions and positions
-    private static final int NO_EN_PASSANT_TARGET_SQUARE = -1;
+    public static final int NO_EN_PASSANT_TARGET_SQUARE = -1;
     private static final int PAWN_DOUBLE_MOVE_OFFSET = 16;
     private static final byte LAST_ROW_WHITE = 55;
     private static final byte LAST_ROW_BLACK = 8;

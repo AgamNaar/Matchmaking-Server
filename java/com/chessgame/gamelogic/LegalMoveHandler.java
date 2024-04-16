@@ -3,6 +3,7 @@ package com.chessgame.gamelogic;
 import com.chessgame.gamelogic.pieces.King;
 import com.chessgame.gamelogic.pieces.Pawn;
 import com.chessgame.gamelogic.pieces.Piece;
+import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 
@@ -12,6 +13,7 @@ import static com.chessgame.gamelogic.GameLogicUtilities.WHITE_PAWN_MOVE_OFFSET;
  * Handles all aspects of making legal moves in a chess game, ensuring that moves do not result in the king walking
  * into check and preventing pieces from moving in ways that expose their own king to check.
  */
+@Component
 public class LegalMoveHandler {
 
     private final LinkedList<Long> threatLineList = new LinkedList<>();
