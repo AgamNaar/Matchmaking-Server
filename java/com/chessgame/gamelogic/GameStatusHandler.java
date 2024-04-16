@@ -1,7 +1,6 @@
 package com.chessgame.gamelogic;
 
 import com.chessgame.ChessGame;
-import com.chessgame.ChessMove;
 import com.chessgame.gamelogic.pieces.Piece;
 
 import java.util.LinkedList;
@@ -23,7 +22,7 @@ public class GameStatusHandler {
     // Flag indicating whether a repetition of moves has occurred
     private boolean repetition = false;
     // List of moves played in the game
-    LinkedList<ChessMove> listOfMoves = new LinkedList<>();
+    LinkedList<PieceMove> listOfMoves = new LinkedList<>();
 
     /**
      * Updates game status and game stage according to the move played and status of the game.
@@ -32,7 +31,7 @@ public class GameStatusHandler {
      * @param game       The instance of the chess game.
      * @return The current game status (NORMAL, CHECK, DRAW, CHECKMATE).
      */
-    public int afterTurnHandler(ChessMove movePlayed, ChessGame game) {
+    public int afterTurnHandler(PieceMove movePlayed, ChessGame game) {
         listOfMoves.add(movePlayed);
         boolean doesPlayerHaveMove = doesPlayerHasLegalMovesToPlay(game.getPlayerToPlay(), game);
 
@@ -59,7 +58,7 @@ public class GameStatusHandler {
      * @param movePlayed The move played in the current turn.
      * @return True if a repetition of moves has occurred, otherwise false.
      */
-    private boolean isRepetitionOfMoves(ChessMove movePlayed) {
+    private boolean isRepetitionOfMoves(PieceMove movePlayed) {
         int listSize = listOfMoves.size();
         int currSquare = movePlayed.getCurrentPieceSquare();
         int targetSquare = movePlayed.getTargetSquare();
@@ -69,8 +68,8 @@ public class GameStatusHandler {
             return false;
 
         // Get the second last turn and the third last turn of the player who just played
-        ChessMove prevMove = listOfMoves.get(listSize - 5);
-        ChessMove prevPrevMove = listOfMoves.get(listSize - 9);
+        PieceMove prevMove = listOfMoves.get(listSize - 5);
+        PieceMove prevPrevMove = listOfMoves.get(listSize - 9);
 
         // Check if the player has repeated the same move twice
         if (currSquare == prevMove.getCurrentPieceSquare() && currSquare == prevPrevMove.getCurrentPieceSquare()
@@ -127,7 +126,7 @@ public class GameStatusHandler {
      */
     public void initialize(ChessGame game) {
         // Handle the first turn (empty move) to initialize the game
-        afterTurnHandler(new ChessMove(), game);
+        afterTurnHandler(new PieceMove(), game);
         // Clear the list of moves
         listOfMoves.clear();
     }

@@ -2,7 +2,7 @@ package com.onlinechessgame;
 
 import com.AuthenticationService;
 import com.ServerResponse;
-import com.chessgame.ChessMove;
+import com.chessgame.gamelogic.PieceMove;
 import com.gameuser.GameUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,13 +36,13 @@ public class OnlineGameController {
      * Checks if the user is valid to submit the move into that specific game.
      *
      * @param gameUser   The GameUser object representing the player
-     * @param playerMove The ChessMove object representing the player's move
+     * @param playerMove The PieceMove object representing the player's move
      * @param gameID     The ID of the online chess game
      * @return A ServerResponse indicating the outcome of the move submission
      */
     @PostMapping(path = "/gameplay/{gameID}")
     public ServerResponse submitPlayerMove(@RequestBody GameUser gameUser,
-                                           @RequestBody ChessMove playerMove,
+                                           @RequestBody PieceMove playerMove,
                                            @PathVariable("gameID") int gameID) {
         // Check if the user is authorized to submit the move into that game
         if (authenticationService.isUserAuthorizedToSubmitMove(gameID, gameUser))
