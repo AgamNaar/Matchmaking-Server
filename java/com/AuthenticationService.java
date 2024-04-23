@@ -2,12 +2,10 @@ package com;
 
 import com.gameuser.GameUser;
 import com.gameuser.GameUserRepository;
+import com.onlinechessgame.LiveGameRepository;
 import com.onlinechessgame.OnlineChessGame;
-import com.onlinechessgame.OnlineChessGameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * Component for providing authentication and authorization services.
@@ -17,19 +15,19 @@ import java.util.Optional;
 public class AuthenticationService {
 
     private final GameUserRepository gameUserRepository;
-    private final OnlineChessGameRepository onlineChessGameRepository;
+    private final LiveGameRepository liveGameRepository;
 
     /**
-     * Constructor for AuthenticationService.
+     * Constructs an AuthenticationService with the specified repositories.
      *
-     * @param gameUserRepository       Repository for accessing game user data
-     * @param onlineChessGameRepository Repository for accessing online chess game data
+     * @param gameUserRepository Repository for accessing game user data.
+     * @param liveGameRepository Repository for accessing live game data.
      */
     @Autowired
     public AuthenticationService(GameUserRepository gameUserRepository,
-                                 OnlineChessGameRepository onlineChessGameRepository) {
+                                 LiveGameRepository liveGameRepository) {
         this.gameUserRepository = gameUserRepository;
-        this.onlineChessGameRepository = onlineChessGameRepository;
+        this.liveGameRepository = liveGameRepository;
     }
 
     /**
@@ -60,22 +58,19 @@ public class AuthenticationService {
      */
     public boolean isUserAuthorizedToSubmitMove(int gameID, GameUser gameUser) {
         // Retrieve the optional online chess game from the repository by its ID
-        Optional<OnlineChessGame> game = onlineChessGameRepository.findById(gameID);
+        OnlineChessGame game = liveGameRepository.findGameByID(gameID);
 
         // If the optional is empty, the game with the specified ID does not exist
-        if (game.isEmpty())
+        if (game == null)
             return false;
 
-        // Get the OnlineChessGame object from the optional
-        OnlineChessGame gameFromDB = game.get();
-
         // Check if the user is the white player and has the correct token
-        if (gameFromDB.getWhiteUserName().equals(gameUser.getUserName())
-                && gameFromDB.getWhitePlayerToken().equals(gameUser.getToken()))
+        if (game.getWhiteUserName().equals(gameUser.getUserName())
+                && game.getWhitePlayerToken().equals(gameUser.getToken()))
             return true;
 
         // Check if the user is the black player and has the correct token
-        return gameFromDB.getBlackUserName().equals(gameUser.getUserName())
-                && gameFromDB.getBlackPlayerToken().equals(gameUser.getToken());
+        return game.getBlackUserName().equals(gameUser.getUserName())
+                && game.getBlackPlayerToken().equals(gameUser.getToken());
     }
 }

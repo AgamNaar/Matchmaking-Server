@@ -1,12 +1,9 @@
 package com.matchmaking;
 
 import com.gameuser.GameUser;
+import com.onlinechessgame.LiveGameRepository;
 import com.onlinechessgame.OnlineChessGame;
-import com.onlinechessgame.OnlineChessGameRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.LinkedList;
 
 /**
  * Monitors the matchmaking process and handles matchmaking operations.
@@ -24,25 +21,21 @@ public class MatchmakingMonitor {
     public static final int SEARCH_NOT_FINISHED = -2;
     public static final int DID_NOT_FIND_PLAYER_TO_PLAY_VS = -1;
 
-    // List to store newly created games
-    private static final LinkedList<OnlineChessGame> newGamesList = new LinkedList<>();
-
     private final MatchmakingRepository matchmakingRepository;
-    private final OnlineChessGameRepository onlineChessGameRepository;
+    private final LiveGameRepository liveGameRepository;
 
     private int currentMatchmaking = 0;
 
     /**
-     * Constructor for MatchmakingMonitor.
+     * Constructs a MatchmakingMonitor with the specified repositories.
      *
-     * @param matchmakingRepository     The repository for matchmaking operations.
-     * @param onlineChessGameRepository The repository for online chess games.
+     * @param matchmakingRepository The repository for matchmaking data.
+     * @param liveGameRepository    The repository for live game data.
      */
-    @Autowired
     public MatchmakingMonitor(MatchmakingRepository matchmakingRepository,
-                              OnlineChessGameRepository onlineChessGameRepository) {
+                              LiveGameRepository liveGameRepository) {
         this.matchmakingRepository = matchmakingRepository;
-        this.onlineChessGameRepository = onlineChessGameRepository;
+        this.liveGameRepository = liveGameRepository;
     }
 
     /**
@@ -78,7 +71,7 @@ public class MatchmakingMonitor {
     /**
      * This method adds the provided user to the matchmaking repository and waits until
      * notified by a newly created game. Once notified, it checks if the user has been
-     * matched with an opponent by iterating through the list of newly created games.
+     * matched with an opponent by checking if a new live game was made for him.
      * If the user is matched, return the game ID of the new game and remove the game from the list.
      * If no game is found , it returns a special code indicating that no match was found.
      *
@@ -92,13 +85,10 @@ public class MatchmakingMonitor {
             matchmakingRepository.add(gameUser);
             // Wait until notified by a newly created game
             wait();
-            // Iterate through the list of new games to find if the user get matched
-            for (OnlineChessGame game : newGamesList) {
-                if (gameUser.getUserName().equals(game.getBlackUserName())) {
-                    newGamesList.remove(game);
-                    return game.getGameID();
-                }
-            }
+            // Check if the players name appear in live game repository, meaning new game for him was made
+            int gameID = liveGameRepository.findGameIdByPlayerUserName(gameUser.getUserName());
+            if (gameID != LiveGameRepository.GAME_NOT_FOUND)
+                return gameID;
         } finally {
             // Delete the user from the repository if not matched
             matchmakingRepository.delete(gameUser);
@@ -127,8 +117,7 @@ public class MatchmakingMonitor {
                 wait();
             // Save the new game on the repository and save it in the new game list
             OnlineChessGame newGame = matchmaking.getNewGame();
-            onlineChessGameRepository.save(newGame);
-            newGamesList.add(newGame);
+            liveGameRepository.createNewGame(newGame);
             return newGame.getGameID();
         } finally {
             // Decrement the current matchmaking count and notify all waiting threads
