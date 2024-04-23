@@ -57,10 +57,13 @@ public class FenTranslator {
     }
 
     /**
-     * Extracts pieces from the FEN string along with their type, color, and position, and saves them as a list.
-     * It iterates through the piece placement section of the FEN string, starting from the top-left square (square 64)
-     * and moving downwards. Each character in the section represents a piece or empty square, and '/' indicates
-     * the end of a row. Each time it adds a new piece to the list accordingly.
+     * Extracts pieces from the FEN string along with their type, color,
+     * and position, and save them in the chess game.
+     * It iterates through the piece placement section of the FEN string,
+     * starting from the top-left square (square 64)
+     * and moving downwards. Each character in the section represents a piece or empty square,
+     * and '/' indicates the end of a row.
+     * Each time it adds a new piece to the list accordingly.
      * The method returns the index position after the piece placement section in the FEN string.
      *
      * @param game           The ChessGame object to which the extracted pieces will be added.
@@ -95,7 +98,7 @@ public class FenTranslator {
     }
 
     /**
-     * Creates a chess piece object from a FEN (Forsyth-Edwards Notation) character representation.
+     * Creates and return a chess piece object from a FEN (Forsyth-Edwards Notation) character representation.
      * It determines the type of the piece based on the provided FEN type
      * and whether it's uppercase (white) or lowercase (black).
      *

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 
+import static com.chessgame.ChessGame.*;
+
 /**
  * Handles game status, normal, check, draw, or checkmate, and checks for repetition of moves.
  * This class is responsible for managing the status of the game, and updating it
@@ -15,13 +17,6 @@ import java.util.LinkedList;
  */
 @Component
 public class GameStatusHandler {
-
-    // Constants defining different game stages
-    public static final int NORMAL = 0;
-    public static final int CHECK = 1;
-    public static final int DRAW = 2;
-    public static final int CHECKMATE = 3;
-
     // Flag indicating whether a repetition of moves has occurred
     private boolean repetition = false;
     // List of moves played in the game

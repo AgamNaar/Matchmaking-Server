@@ -21,6 +21,7 @@ public class OnlineChessGame extends ChessGame {
     private final String blackPlayerToken;
     private final String whiteUserName;
     private final String blackUserName;
+    private String winnerName;
 
     /**
      * Constructor for OnlineChessGame.
@@ -59,4 +60,13 @@ public class OnlineChessGame extends ChessGame {
     public String getBlackUserName() {
         return blackUserName;
     }
+
+    public void setWinnerName(String winnerName) {
+        this.winnerName = winnerName;
+    }
+
+    public String getWinnerName() {
+        return winnerName;
+    }
+
 }

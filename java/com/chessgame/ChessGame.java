@@ -28,7 +28,12 @@ public class ChessGame {
     private GameStatusHandler gameStatusHandler;
     private FenTranslator translator;
 
+    // Constants defining different game status
     public static final int MOVE_NOT_EXECUTED = -1;
+    public static final int NORMAL = 0;
+    public static final int CHECK = 1;
+    public static final int DRAW = 2;
+    public static final int CHECKMATE = 3;
     public static final char PROMOTE_TO_QUEEN = 'q';
     public static final char PROMOTE_TO_ROOK = 'r';
     public static final char PROMOTE_TO_KNIGHT = 'n';
@@ -49,16 +54,6 @@ public class ChessGame {
         this.translator = translator;
         this.legalMoveHandler = legalMoveHandler;
         this.gameStatusHandler = gameStatusHandler;
-    }
-
-    /**
-     * Initializes a new instance of the ChessGame class.
-     *
-     * @param fen The FEN (Forsyth-Edwards Notation) string representing the initial state of the chess game.
-     *            If empty or null, the game will start from the default setup.
-     */
-    public ChessGame(String fen) {
-        reset(fen);
     }
 
     /**
@@ -141,6 +136,10 @@ public class ChessGame {
 
         return gameStatusHandler.afterTurnHandler(new ChessMove(currentSquare, targetSquare,
                 typeOfPieceToPromoteTo), this);
+    }
+
+    public int executeMove(ChessMove move) {
+        return executeMove(move.getCurrentPieceSquare(), move.getTargetSquare(), move.getTypeOfPieceToPromoteTo());
     }
 
     /**

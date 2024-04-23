@@ -60,4 +60,8 @@ public class ChessMove {
     public byte getTargetSquare() {
         return targetSquare;
     }
+
+    public char getTypeOfPieceToPromoteTo() {
+        return typeOfPieceToPromoteTo;
+    }
 }

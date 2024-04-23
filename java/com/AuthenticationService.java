@@ -49,7 +49,7 @@ public class AuthenticationService {
 
     /**
      * Checks if the user is authorized to submit a move to the game with the given game ID.
-     * Checks if the game exists in the DB, and if that user is authorized to submit the move,
+     * Checks if the game exists in the Live game repository, and if that user is authorized to submit the move,
      * by checking that the username and token is matching to that of the game.
      *
      * @param gameID   The ID of the online chess game
@@ -57,10 +57,10 @@ public class AuthenticationService {
      * @return true if the user is valid to submit a move, false otherwise
      */
     public boolean isUserAuthorizedToSubmitMove(int gameID, GameUser gameUser) {
-        // Retrieve the optional online chess game from the repository by its ID
+        // Retrieve the online chess game from the repository by its ID
         OnlineChessGame game = liveGameRepository.findGameByID(gameID);
 
-        // If the optional is empty, the game with the specified ID does not exist
+        // If game is null, the game with the specified ID does not exist
         if (game == null)
             return false;
 
