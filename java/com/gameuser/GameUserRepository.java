@@ -1,7 +1,10 @@
 package com.gameuser;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.LinkedList;
 
 /**
  * Repository interface for accessing game user data.
@@ -23,4 +26,12 @@ public interface GameUserRepository extends JpaRepository<GameUser, String> {
      * @return The game user with the specified email address, or null if not found
      */
     GameUser findByEmail(String email);
+
+    /**
+     * Retrieves the top 4 players with the highest elo (rating).
+     *
+     * @return A list of the top 4 players
+     */
+    @Query("SELECT u FROM GameUser u ORDER BY u.rating DESC LIMIT 4")
+    LinkedList<GameUser> findTop4Players();
 }

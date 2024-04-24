@@ -2,10 +2,7 @@ package com.gameuser;
 
 import com.ServerResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller class for managing game user operations.
@@ -60,5 +57,15 @@ public class GameUserController {
     @PostMapping(path = "/login")
     public ServerResponse logIntoAccount(@RequestBody GameUser gameUser) {
         return gameUserService.logIntoAccount(gameUser);
+    }
+
+    /**
+     * Retrieves the top four rated players.
+     *
+     * @return A ServerResponse containing information about the top four rated players.
+     */
+    @GetMapping(path = "/get-top4")
+    public ServerResponse getTopFourRatedPlayer() {
+        return gameUserService.getTopFourRatedPlayer();
     }
 }

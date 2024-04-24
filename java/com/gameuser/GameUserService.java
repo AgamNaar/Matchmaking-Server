@@ -103,6 +103,17 @@ public class GameUserService {
     }
 
     /**
+     * Retrieves the top 4 players with the highest rating and returns them as a string representation
+     * in the response.
+     *
+     * @return A ServerResponse containing the string representation of the top 4 players
+     */
+    public ServerResponse getTopFourRatedPlayer() {
+        // Returns the string representation in a ServerResponse with HTTP status OK
+        return new ServerResponse(String.valueOf(gameUserRepository.findTop4Players()), HttpStatus.OK);
+    }
+
+    /**
      * Checks if the provided username and password combination is incorrect, according to the DB.
      *
      * @param userName       The username to check
