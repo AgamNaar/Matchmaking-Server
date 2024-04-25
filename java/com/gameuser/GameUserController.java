@@ -68,4 +68,16 @@ public class GameUserController {
     public ServerResponse getTopFourRatedPlayer() {
         return gameUserService.getTopFourRatedPlayer();
     }
+
+    /**
+     * Retrieves a player by his username
+     *
+     * @return A ServerResponse containing information about the player.
+     */
+    @PostMapping(path = "/get-user")
+    public ServerResponse getPlayerByUsername(@RequestBody GameUser userToFind) {
+        return gameUserService.getPlayByName(userToFind);
+    }
+
+
 }

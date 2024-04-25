@@ -3,6 +3,7 @@ package com.matchmaking;
 import com.gameuser.GameUser;
 import com.onlinechessgame.LiveGameRepository;
 import com.onlinechessgame.OnlineChessGame;
+import com.onlinechessgame.OnlineChessGameRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,19 +24,22 @@ public class MatchmakingMonitor {
 
     private final MatchmakingRepository matchmakingRepository;
     private final LiveGameRepository liveGameRepository;
+    private final OnlineChessGameRepository onlineChessGameRepository;
 
     private int currentMatchmaking = 0;
 
     /**
      * Constructs a MatchmakingMonitor with the specified repositories.
      *
-     * @param matchmakingRepository The repository for matchmaking data.
-     * @param liveGameRepository    The repository for live game data.
+     * @param matchmakingRepository     The repository for matchmaking data.
+     * @param liveGameRepository        The repository for live game data.
+     * @param onlineChessGameRepository The repository for online games.
      */
     public MatchmakingMonitor(MatchmakingRepository matchmakingRepository,
-                              LiveGameRepository liveGameRepository) {
+                              LiveGameRepository liveGameRepository, OnlineChessGameRepository onlineChessGameRepository) {
         this.matchmakingRepository = matchmakingRepository;
         this.liveGameRepository = liveGameRepository;
+        this.onlineChessGameRepository = onlineChessGameRepository;
     }
 
     /**
@@ -115,8 +119,14 @@ public class MatchmakingMonitor {
             // Wait for thread to finish running
             while (matchmaking.getNewGameID() == SEARCH_NOT_FINISHED)
                 wait();
+
+            // Check if it found an opponent
+            if (matchmaking.getNewGameID() == DID_NOT_FIND_PLAYER_TO_PLAY_VS)
+                return DID_NOT_FIND_PLAYER_TO_PLAY_VS;
+
             // Save the new game on the repository and save it in the new game list
             OnlineChessGame newGame = matchmaking.getNewGame();
+            onlineChessGameRepository.save(newGame);
             liveGameRepository.createNewGame(newGame);
             return newGame.getGameID();
         } finally {

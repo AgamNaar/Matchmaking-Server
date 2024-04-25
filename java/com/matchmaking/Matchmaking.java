@@ -13,7 +13,7 @@ import com.onlinechessgame.OnlineChessGame;
 public class Matchmaking extends Thread {
 
     // Constants for search timeout, maximum elo range, initial elo range, and elo increment
-    private static final long SEARCH_TIME_OUT = 5 * 1000;
+    private static final long SEARCH_TIME_OUT = 20 * 1000;
     private static final int MAX_ELO_RANGE = 500;
     private static final int INITIAL_ELO_RANGE = 10;
     private static final int ELO_INCREMENT = 10;

@@ -37,11 +37,15 @@ public class AuthenticationService {
      * @return true if the provided token is valid, false otherwise
      */
     public boolean isValidToken(GameUser gameUser) {
-        // Retrieve the token from the GameUser object
-        String userToken = gameUser.getToken();
-
         // Retrieve the token stored in the database for the user
-        String DBUserToken = gameUserRepository.findByUserName(gameUser.getUserName()).getToken();
+        GameUser gameUserInDB = gameUserRepository.findByUserName(gameUser.getUserName());
+
+        // Check that the account exsist in the DB
+        if (gameUserInDB == null)
+            return false;
+
+        String userToken = gameUser.getToken();
+        String DBUserToken = gameUserInDB.getToken();
 
         // Compare the two tokens to determine if they match
         return userToken.equals(DBUserToken);

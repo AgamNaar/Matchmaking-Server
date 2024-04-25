@@ -42,7 +42,7 @@ public class MatchmakingController {
      * @return A server response indicating success or failure of the matchmaking process.
      * If successful, return the game ID of the match that was found.
      */
-    @PostMapping(path = "/find")
+    @PostMapping(path = "/find-match")
     public ServerResponse findOnlineMatch(@RequestBody GameUser gameUser) {
         // Check if the user have a valid token
         if (userAuthentication.isValidToken(gameUser))

@@ -16,7 +16,8 @@ public class GameUserService {
 
     // Error message constants
     private static final String WRONG_USER_INFO = "Username or password isn't correct";
-    private static final String INVALID_USER_INFO = "User info is invalid";
+    private static final String INVALID_USER_INFO = "User info is invalid, Please check";
+    private static final String USER_DOEST_EXIST = "The user docent exist in the DB";
 
     private final GameUserRepository gameUserRepository;
     private final GameUserInfoValidation gameUserInfoValidation;
@@ -43,7 +44,7 @@ public class GameUserService {
     public ServerResponse createAnAccount(GameUser gameUser) {
         // Verify that new game user info is valid, and not in use in the DB
         if (gameUserInfoValidation.isGameUserInfoInvalid(gameUser))
-            return new ServerResponse(INVALID_USER_INFO, HttpStatus.BAD_REQUEST);
+            return new ServerResponse(WRONG_USER_INFO, HttpStatus.BAD_REQUEST);
 
         // Try to add the new account to the database
         try {
@@ -86,16 +87,19 @@ public class GameUserService {
      * @return A ServerResponse indicating the outcome of the operation, including user new token.
      */
     public ServerResponse logIntoAccount(GameUser gameUser) {
+        // Get game user data from DB
+        GameUser gameUserInDB = gameUserRepository.findByUserName(gameUser.getUserName());
+
         // Check if the provided username and password are matching
-        if (isUserInfoWrong(gameUser.getUserName(), gameUser.getPassword()))
+        if (gameUserInDB == null || !gameUserInDB.getPassword().equals(gameUser.getPassword()))
             return new ServerResponse(INVALID_USER_INFO, HttpStatus.BAD_REQUEST);
 
         // Try to save the account in the database with a new token
         try {
             // Generate a new token for the account and save it in the DB
             String newToken = UUID.randomUUID().toString();
-            gameUser.setToken(newToken);
-            gameUserRepository.save(gameUser);
+            gameUserInDB.setToken(newToken);
+            gameUserRepository.save(gameUserInDB);
             return new ServerResponse(newToken, HttpStatus.OK);
         } catch (Exception exception) {
             return new ServerResponse(exception.toString(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -114,6 +118,24 @@ public class GameUserService {
     }
 
     /**
+     * Retrieves a user by their username and returns a ServerResponse.
+     *
+     * @param userToFind The GameUser object containing the username of the user to find.
+     * @return A ServerResponse object containing information about the operation.
+     */
+    public ServerResponse getPlayByName(GameUser userToFind) {
+        // Find the user in the repository by their username
+        GameUser user = gameUserRepository.findByUserName(userToFind.getUserName());
+
+        // If the user is not found, return a ServerResponse with an error status
+        if (user == null)
+            return new ServerResponse(USER_DOEST_EXIST, HttpStatus.BAD_REQUEST);
+
+        // If the user is found, return a ServerResponse with the user information and a success status
+        return new ServerResponse(user.toString(), HttpStatus.OK);
+    }
+
+    /**
      * Checks if the provided username and password combination is incorrect, according to the DB.
      *
      * @param userName       The username to check
@@ -124,4 +146,6 @@ public class GameUserService {
         GameUser gameUserInDB = gameUserRepository.findByUserName(userName);
         return gameUserInDB == null || !gameUserInDB.getPassword().equals(passwordByUser);
     }
+
+
 }
