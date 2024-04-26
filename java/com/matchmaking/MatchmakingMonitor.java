@@ -49,10 +49,11 @@ public class MatchmakingMonitor {
      * If no opponent is found within the timeout, it returns a special code indicating that no match was found.
      *
      * @param gameUser The game user requesting an online match.
+     * @param userIP   The user's IP address
      * @return The ID of the matched game or a special code if no match is found.
      * @throws InterruptedException If interrupted while waiting.
      */
-    public synchronized int findOnlineMatch(GameUser gameUser) throws InterruptedException {
+    public synchronized int findOnlineMatch(GameUser gameUser, String userIP) throws InterruptedException {
         int gameID;
         long startTime = System.currentTimeMillis();
 
@@ -61,10 +62,10 @@ public class MatchmakingMonitor {
             // Check if the repository is not empty and maximum matchmaking attempts not reached
             if (!matchmakingRepository.isEmpty() && currentMatchmaking < MAX_MATCHMAKING) {
                 // Start a new search for a game and return its ID
-                return startNewSearchAndReturnGameID(gameUser);
+                return startNewSearchAndReturnGameID(gameUser, userIP);
             } else {
                 // Wait for a game to be available and return its ID
-                gameID = waitForGameAndReturnGameID(gameUser);
+                gameID = waitForGameAndReturnGameID(gameUser, userIP);
                 if (gameID != DID_NOT_FIND_PLAYER_TO_PLAY_VS)
                     return gameID;
             }
@@ -80,10 +81,11 @@ public class MatchmakingMonitor {
      * If no game is found , it returns a special code indicating that no match was found.
      *
      * @param gameUser The user waiting for a game.
+     * @param userIP   The user's IP address
      * @return The ID of the game or a special code if no match is found.
      * @throws InterruptedException If interrupted while waiting.
      */
-    private synchronized int waitForGameAndReturnGameID(GameUser gameUser) throws InterruptedException {
+    private synchronized int waitForGameAndReturnGameID(GameUser gameUser, String userIP) throws InterruptedException {
         try {
             // Add the user to the matchmaking repository
             matchmakingRepository.add(gameUser);
@@ -91,8 +93,11 @@ public class MatchmakingMonitor {
             wait();
             // Check if the players name appear in live game repository, meaning new game for him was made
             int gameID = liveGameRepository.findGameIdByPlayerUserName(gameUser.getUserName());
-            if (gameID != LiveGameRepository.GAME_NOT_FOUND)
+            if (gameID != LiveGameRepository.GAME_NOT_FOUND) {
+                liveGameRepository.findGameByID(gameID).setBlackPlayerIP(userIP);
                 return gameID;
+
+            }
         } finally {
             // Delete the user from the repository if not matched
             matchmakingRepository.delete(gameUser);
@@ -103,14 +108,16 @@ public class MatchmakingMonitor {
     /**
      * Starts a new matchmaking search and returns the ID of the newly created game.
      * Once the thread finishes and a new game is created, it adds the
-     * game to the list and returns its ID. If no game is found within the timeout, it
+     * game to the list and returns its ID. If no game is found within the timeout,
      * returns a special code indicating that no match was found.
      *
      * @param gameUser The user initiating the matchmaking search.
+     * @param userIP   The user's IP address
      * @return The ID of the newly created game or a special code if no match is found.
      * @throws InterruptedException If interrupted while waiting.
      */
-    private synchronized int startNewSearchAndReturnGameID(GameUser gameUser) throws InterruptedException {
+    private synchronized int startNewSearchAndReturnGameID(GameUser gameUser, String userIP)
+            throws InterruptedException {
         try {
             currentMatchmaking++;
             // Create a new matchmaking instance and start the thread
@@ -126,6 +133,7 @@ public class MatchmakingMonitor {
 
             // Save the new game on the repository and save it in the new game list
             OnlineChessGame newGame = matchmaking.getNewGame();
+            newGame.setWhitePlayerIP(userIP);
             onlineChessGameRepository.save(newGame);
             liveGameRepository.createNewGame(newGame);
             return newGame.getGameID();

@@ -3,6 +3,7 @@ package com.matchmaking;
 import com.AuthenticationService;
 import com.ServerResponse;
 import com.gameuser.GameUser;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,17 +37,22 @@ public class MatchmakingController {
     }
 
     /**
-     * Endpoint to find an online match for a given user, require token and username.
+     * Endpoint to find an online match for a given user.
+     * <p>
+     * This endpoint requires a valid authentication token and a username.
      *
-     * @param gameUser As JSON, The user requesting a match.
-     * @return A server response indicating success or failure of the matchmaking process.
-     * If successful, return the game ID of the match that was found.
+     * @param gameUser The user requesting a match. This should be provided as JSON in the request body.
+     *                 It must contain the user's authentication token and username.
+     * @param request  The HttpServletRequest object containing the request information.
+     * @return A server response indicating the success or failure of the matchmaking process.
+     * If successful, the response contains the game ID of the match that was found.
+     * If the authentication token is invalid, the response returns an error indicating the token is invalid.
      */
     @PostMapping(path = "/find-match")
-    public ServerResponse findOnlineMatch(@RequestBody GameUser gameUser) {
-        // Check if the user have a valid token
+    public ServerResponse findOnlineMatch(@RequestBody GameUser gameUser, HttpServletRequest request) {
+        // Check if the user has a valid token
         if (userAuthentication.isValidToken(gameUser))
-            return matchmakingService.findOnlineMatch(gameUser);
+            return matchmakingService.findOnlineMatch(gameUser, request.getRemoteAddr());
         else
             return new ServerResponse(INVALID_TOKEN, HttpStatus.BAD_REQUEST);
     }
