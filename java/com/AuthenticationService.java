@@ -40,7 +40,7 @@ public class AuthenticationService {
         // Retrieve the token stored in the database for the user
         GameUser gameUserInDB = gameUserRepository.findByUserName(gameUser.getUserName());
 
-        // Check that the account exsist in the DB
+        // Check that the account exist in the DB
         if (gameUserInDB == null)
             return false;
 
@@ -60,7 +60,7 @@ public class AuthenticationService {
      * @param gameUser The GameUser object representing the user attempting to submit the move
      * @return true if the user is valid to submit a move, false otherwise
      */
-    public boolean isUserAuthorizedToSubmitMove(int gameID, GameUser gameUser) {
+    public boolean isUserAuthorizedToAccessGame(int gameID, GameUser gameUser) {
         // Retrieve the online chess game from the repository by its ID
         OnlineChessGame game = liveGameRepository.findGameByID(gameID);
 
