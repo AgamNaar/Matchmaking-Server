@@ -58,13 +58,35 @@ public class GamePlayController {
     }
 
     /**
+     * Notifies the remote GamePlayService that a challenge has been accepted for the specified game.
+     *
+     * @param playerIP    The IP address of the player who accepted the challenge.
+     * @param playerToken The token of the player who accepted the challenge.
+     * @param gameID      The ID of the game for which the challenge has been accepted.
+     */
+    public void challengeAccepted(String playerIP, String playerToken, int gameID) {
+        // Determine the URL to send the acceptance notification based on the player information
+        String urlToSend = createUrl(playerIP, playerToken);
+        try {
+            // Lookup the remote GamePlayService using RMI registry
+            GamePlayService service = (GamePlayService) Naming.lookup(urlToSend);
+
+            // Notify the remote service about the acceptance of the challenge
+            service.challengeAccept(gameID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
      * Generates the URL to send requests to the remote GamePlayService based on the game and player information.
      *
      * @param game        The OnlineChessGame object representing the current game.
      * @param otherPlayer The GameUser object representing the opponent player.
      * @return The URL to send requests to the remote GamePlayService.
      */
-    public String getPlayerToSendURL(OnlineChessGame game, GameUser otherPlayer) {
+    private String getPlayerToSendURL(OnlineChessGame game, GameUser otherPlayer) {
         String secondPlayerIP;
         String secondPlayerToken;
         // Determine the IP address and token of the opponent player based on the game
@@ -77,6 +99,10 @@ public class GamePlayController {
         }
 
         // Construct and return the URL using the opponent's IP address and token
-        return "rmi://" + secondPlayerIP + ":" + PORT + "/" + secondPlayerToken;
+        return createUrl(secondPlayerIP, secondPlayerToken);
+    }
+
+    private String createUrl(String IP, String token) {
+        return "rmi://" + IP + ":" + PORT + "/" + token;
     }
 }

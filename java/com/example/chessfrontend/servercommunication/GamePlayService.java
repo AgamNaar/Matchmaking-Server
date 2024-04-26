@@ -21,11 +21,19 @@ public interface GamePlayService extends Remote {
 
     /**
      * Notifies the client that the enemy has resigned from the game.
-     * <p>
      * This method is called remotely by the server to inform the client that the opponent has resigned from the game.
      *
      * @throws RemoteException If there is a communication-related issue during the remote method invocation.
-     *                         This exception is thrown to indicate that a communication failure has occurred.
      */
     void enemyResigned() throws RemoteException;
+
+    /**
+     * Accepts a challenge for the specified game.
+     * This method is called remotely by the server to indicate that a challenge for a game has been accepted.
+     * It typically updates the game state to reflect the acceptance of the challenge.
+     *
+     * @param gameID The ID of the game for which the challenge is being accepted.
+     * @throws RemoteException If there is a communication-related issue during the remote method invocation.
+     */
+    void challengeAccept(int gameID) throws RemoteException;
 }
