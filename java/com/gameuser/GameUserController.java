@@ -60,13 +60,13 @@ public class GameUserController {
     }
 
     /**
-     * Retrieves the top five rated players.
+     * Retrieves the top 100 rated players.
      *
-     * @return A ServerResponse containing information about the top five rated players.
+     * @return A ServerResponse containing information about the top 100 rated players.
      */
-    @GetMapping(path = "/get-top5")
+    @GetMapping(path = "/get-top100")
     public ServerResponse getTopFiveRatedPlayer() {
-        return gameUserService.getTopFiveRatedPlayer();
+        return gameUserService.getTop100RatedPlayer();
     }
 
     /**

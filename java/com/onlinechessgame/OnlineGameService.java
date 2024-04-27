@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
+
 /**
  * Service class for managing online chess games. Handles player moves, turn validations,
  * and game result processing. It interacts with repositories to access game and player data.
@@ -205,5 +207,26 @@ public class OnlineGameService {
         // Save the updated Elo ratings for both players
         gameUserRepository.save(playerA);
         gameUserRepository.save(playerB);
+    }
+
+    /**
+     * Retrieves the last 100 games for a given user.
+     *
+     * @param gameUser The user for whom the game history is to be retrieved.
+     * @return A ServerResponse object containing the last 100 games as a string if found, or a BAD_REQUEST response
+     * if no games are found.
+     */
+    public ServerResponse getLast100Games(GameUser gameUser) {
+        // Get the username from the gameUser object
+        LinkedList<OnlineChessGame> gameHistoryList;
+        String userName = gameUser.getUserName();
+        // Get the last 100 games of that player from the repository
+        gameHistoryList = onlineChessGameRepository.findTop100Players(userName);
+        // Check if its null or empty, if yes return bad request
+        if (gameHistoryList == null || gameHistoryList.isEmpty())
+            return new ServerResponse(HttpStatus.BAD_REQUEST);
+
+        // Return the last 100 moves as a list
+        return new ServerResponse(gameHistoryList.toString(), HttpStatus.OK);
     }
 }

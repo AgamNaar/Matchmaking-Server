@@ -79,7 +79,7 @@ public class MatchmakingService {
      */
     public ServerResponse createGame(GameUser gameUser, String userIP) {
         // Generate a unique game code ID
-        String gameCodeID = UUID.randomUUID().toString();
+        String gameCodeID = UUID.randomUUID().toString().substring(0, 4);
         // Create game info object
         ChallengeInviteInfo gameInfo = new ChallengeInviteInfo(gameUser.getUserName(), userIP,
                 gameCodeID, gameUser.getToken());

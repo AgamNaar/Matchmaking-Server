@@ -28,11 +28,11 @@ public interface GameUserRepository extends JpaRepository<GameUser, String> {
     GameUser findByEmail(String email);
 
     /**
-     * Retrieves the top 4 players with the highest elo (rating).
+     * Retrieves the top 100 players with the highest elo (rating).
      *
-     * @return A list of the top 4 players
+     * @return A list of the top 100 players
      */
-    @Query("SELECT u FROM GameUser u ORDER BY u.rating DESC LIMIT 5")
-    LinkedList<GameUser> findTop5Players();
+    @Query("SELECT u FROM GameUser u ORDER BY u.rating DESC LIMIT 100")
+    LinkedList<GameUser> findTop100Players();
 
 }

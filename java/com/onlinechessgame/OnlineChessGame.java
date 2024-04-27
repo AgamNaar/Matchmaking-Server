@@ -48,6 +48,9 @@ public class OnlineChessGame extends ChessGame {
         this.blackUserName = blackUserName;
     }
 
+    public OnlineChessGame() {
+    }
+
     public int getGameID() {
         return gameID;
     }
@@ -114,5 +117,15 @@ public class OnlineChessGame extends ChessGame {
 
     public boolean getPlayerColor(GameUser gameUser) {
         return gameUser.getUserName().equals(whiteUserName);
+    }
+
+    @Override
+    public String toString() {
+        return "OnlineChessGame{" +
+                "gameID=" + gameID +
+                ", whiteUserName='" + whiteUserName + '\'' +
+                ", blackUserName='" + blackUserName + '\'' +
+                ", winnerName='" + winnerName + '\'' +
+                '}';
     }
 }

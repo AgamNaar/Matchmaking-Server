@@ -81,5 +81,15 @@ public class OnlineGameController {
         return chessGameService.getPlayerOfMatch(gameID);
     }
 
+    /**
+     * Retrieves the last 100 game of a player by his username
+     *
+     * @return A ServerResponse containing information about the last 100 games of a player
+     */
+    @GetMapping(path = "/match-history100")
+    public ServerResponse getTopFiveRatedPlayer(@RequestBody GameUser gameUser) {
+        return chessGameService.getLast100Games(gameUser);
+    }
+
 
 }
