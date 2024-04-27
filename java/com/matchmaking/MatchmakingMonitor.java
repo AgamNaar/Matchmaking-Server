@@ -49,21 +49,20 @@ public class MatchmakingMonitor {
         this.gamePlayController = gamePlayController;
     }
 
+
     /**
-     * Adds a new game to the matchmaking system with the provided details.
+     * Adds a new chess game to matchmaking and notifies the opponent about the challenge acceptance.
      *
-     * @param user1           The first user initiating the game.
-     * @param player1Ip       The IP address of the first player.
-     * @param player2UserName The username of the second player.
-     * @param player2IP       The IP address of the second player.
-     * @param player2Token    The token of the second player.
-     * @return The ID of the created game or FAILED_TO_CREATE_GAME if unsuccessful.
+     * @param user1 The first user initiating the challenge
+     * @param player1Ip The IP address of the first player
+     * @param user2 The second user accepting the challenge
+     * @param player2IP The IP address of the second player
+     * @return The ID of the created game if successful, -1 if failed
      */
-    public synchronized int addToMatchmaking(GameUser user1, String player1Ip, String player2UserName,
-                                             String player2IP, String player2Token) {
+    public synchronized int addToMatchmaking(GameUser user1, String player1Ip, GameUser user2, String player2IP) {
         // Create a new OnlineChessGame object with the provided user and player details
-        OnlineChessGame chessGame = new OnlineChessGame(user1.getToken(), player2Token,
-                user1.getUserName(), player2UserName);
+        OnlineChessGame chessGame = new OnlineChessGame(user1.getToken(), user2.getToken(),
+                user1.getUserName(), user2.getUserName(), user1.getRating(),user2.getRating());
         // Set the IP addresses of the players
         chessGame.setWhitePlayerIP(player1Ip);
         chessGame.setBlackPlayerIP(player2IP);
@@ -75,7 +74,7 @@ public class MatchmakingMonitor {
 
         // Try to notify the other player that the challenge has been accepted
         try {
-            gamePlayController.challengeAccepted(player2IP, player2Token, chessGame.getGameID());
+            gamePlayController.challengeAccepted(player2IP, user2.getToken(), chessGame.getGameID());
         } catch (Exception e) {
             // If an exception occurs, delete the game from both repositories
             liveGameRepository.deleteByID(chessGame.getGameID());

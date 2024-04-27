@@ -81,8 +81,7 @@ public class MatchmakingService {
         // Generate a unique game code ID
         String gameCodeID = UUID.randomUUID().toString().substring(0, 4);
         // Create game info object
-        ChallengeInviteInfo gameInfo = new ChallengeInviteInfo(gameUser.getUserName(), userIP,
-                gameCodeID, gameUser.getToken());
+        ChallengeInviteInfo gameInfo = new ChallengeInviteInfo(gameUser, userIP, gameCodeID);
         // Add game info to the list of pending challenges
         pendingChallengesInfoList.add(gameInfo);
         // Return a ServerResponse with the game code ID and OK status
@@ -104,9 +103,7 @@ public class MatchmakingService {
             if (gameInfo.getGameCodeID().equals(gameCodeID)) {
                 // Add the game to the matchmaking and retrieve game ID
                 int gameID = matchmakingMonitor.addToMatchmaking(gameUser, userIP,
-                        gameInfo.getUserNameOfPlayerWhoCreated(),
-                        gameInfo.getIpOfUserWhoCreated(),
-                        gameInfo.getTokenOfPLayerWhoCreated());
+                        gameInfo.getUserWhoCreated(), gameInfo.getIpUserWhoCreated());
                 // Check if failed to create game
                 if (gameID == FAILED_TO_CREATE_GAME)
                     // Return ServerResponse with internal server error status
@@ -128,7 +125,7 @@ public class MatchmakingService {
     public ServerResponse cancelGame(GameUser gameUser) {
         // Iterate through pending challenges to find the game created by the user
         for (ChallengeInviteInfo info : pendingChallengesInfoList) {
-            if (info.getTokenOfPLayerWhoCreated().equals(gameUser.getToken())) {
+            if (info.getUserWhoCreated().getToken().equals(gameUser.getToken())) {
                 // Remove game info from the list of pending challenges
                 pendingChallengesInfoList.remove(info);
                 // Return ServerResponse with OK status

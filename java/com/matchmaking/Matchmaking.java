@@ -91,7 +91,8 @@ public class Matchmaking extends Thread {
     private void createAndSaveNewGame(GameUser secondPlayer) {
         // Create a new online chess game
         newGame = new OnlineChessGame(firstPlayer.getToken(), secondPlayer.getToken(),
-                firstPlayer.getUserName(), secondPlayer.getUserName());
+                firstPlayer.getUserName(), secondPlayer.getUserName(),
+                firstPlayer.getRating(), secondPlayer.getRating());
 
         newGameID = newGame.getGameID();
         // Notify monitor about the new game

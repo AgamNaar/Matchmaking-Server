@@ -29,23 +29,21 @@ public class OnlineChessGame extends ChessGame {
     @Transient
     private String whitePlayerIP;
     private String winnerName;
+    private int whitePlayerRating;
+    private int blackPlayerRating;
 
-    /**
-     * Constructor for OnlineChessGame.
-     *
-     * @param whitePlayerToken The token of the white player.
-     * @param blackPlayerToken The token of the black player.
-     * @param whiteUserName    The username of the white player.
-     * @param blackUserName    The username of the black player.
-     */
     public OnlineChessGame(String whitePlayerToken,
                            String blackPlayerToken,
                            String whiteUserName,
-                           String blackUserName) {
+                           String blackUserName,
+                           int whitePlayerRating,
+                           int blackPlayerRating) {
         this.whitePlayerToken = whitePlayerToken;
         this.blackPlayerToken = blackPlayerToken;
         this.whiteUserName = whiteUserName;
         this.blackUserName = blackUserName;
+        this.whitePlayerRating = whitePlayerRating;
+        this.blackPlayerRating = blackPlayerRating;
     }
 
     public OnlineChessGame() {
@@ -126,6 +124,8 @@ public class OnlineChessGame extends ChessGame {
                 ", whiteUserName='" + whiteUserName + '\'' +
                 ", blackUserName='" + blackUserName + '\'' +
                 ", winnerName='" + winnerName + '\'' +
+                ", whitePlayerRating=" + whitePlayerRating +
+                ", blackPlayerRating=" + blackPlayerRating +
                 '}';
     }
 }
