@@ -6,10 +6,7 @@ import com.gameuser.GameUser;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller class for matchmaking related operations.
@@ -38,8 +35,6 @@ public class MatchmakingController {
 
     /**
      * Endpoint to find an online match for a given user.
-     * <p>
-     * This endpoint requires a valid authentication token and a username.
      *
      * @param gameUser The user requesting a match. This should be provided as JSON in the request body.
      *                 It must contain the user's authentication token and username.
@@ -56,4 +51,58 @@ public class MatchmakingController {
         else
             return new ServerResponse(INVALID_TOKEN, HttpStatus.BAD_REQUEST);
     }
+
+
+    /**
+     * Endpoint for joining action challenge game invention
+     *
+     * @param gameUser   The user object containing necessary information for joining the game.
+     * @param gameCodeID The unique identifier of the game.
+     * @param request    The HTTP request object.
+     * @return A ServerResponse indicating success or failure of joining the game,
+     * if successful return the game ID
+     */
+    @PostMapping(path = "/join-invention/{gameCodeID}")
+    public ServerResponse joinGame(@RequestBody GameUser gameUser,
+                                   @PathVariable("gameCodeID") String gameCodeID,
+                                   HttpServletRequest request) {
+        // Check if the user has a valid token
+        if (userAuthentication.isValidToken(gameUser))
+            return matchmakingService.joinGame(gameUser, gameCodeID, request.getRemoteAddr());
+        else
+            return new ServerResponse(INVALID_TOKEN, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Endpoint to creating a challenge game invention
+     *
+     * @param gameUser The user object creating the game.
+     * @param request  The HTTP request object.
+     * @return A ServerResponse indicating success or failure of creating the game.
+     * if successful, return the game id of the new created game.
+     */
+    @PostMapping(path = "/create-invention")
+    public ServerResponse createGame(@RequestBody GameUser gameUser, HttpServletRequest request) {
+        // Check if the user has a valid token
+        if (userAuthentication.isValidToken(gameUser))
+            return matchmakingService.createGame(gameUser, request.getRemoteAddr());
+        else
+            return new ServerResponse(INVALID_TOKEN, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Endpoint for canceling a challenge link invention
+     *
+     * @param gameUser The user object canceling the game.
+     * @return A ServerResponse indicating success or failure of canceling the game.
+     */
+    @PostMapping(path = "/cancel-invention")
+    public ServerResponse cancelGame(@RequestBody GameUser gameUser) {
+        // Check if the user has a valid token
+        if (userAuthentication.isValidToken(gameUser))
+            return matchmakingService.cancelGame(gameUser);
+        else
+            return new ServerResponse(INVALID_TOKEN, HttpStatus.BAD_REQUEST);
+    }
+
 }

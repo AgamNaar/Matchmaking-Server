@@ -1,5 +1,6 @@
 package com.matchmaking;
 
+import com.example.chessfrontend.servercommunication.GamePlayController;
 import com.gameuser.GameUser;
 import com.onlinechessgame.LiveGameRepository;
 import com.onlinechessgame.OnlineChessGame;
@@ -19,12 +20,14 @@ public class MatchmakingMonitor {
     private static final long MATCH_MAKING_TIME_OUT = 20 * 1000;
 
     // Special return codes for indicating search status
-    public static final int SEARCH_NOT_FINISHED = -2;
     public static final int DID_NOT_FIND_PLAYER_TO_PLAY_VS = -1;
+    public static final int SEARCH_NOT_FINISHED = -2;
+    public static final int FAILED_TO_CREATE_GAME = -3;
 
     private final MatchmakingRepository matchmakingRepository;
     private final LiveGameRepository liveGameRepository;
     private final OnlineChessGameRepository onlineChessGameRepository;
+    private final GamePlayController gamePlayController;
 
     private int currentMatchmaking = 0;
 
@@ -34,13 +37,54 @@ public class MatchmakingMonitor {
      * @param matchmakingRepository     The repository for matchmaking data.
      * @param liveGameRepository        The repository for live game data.
      * @param onlineChessGameRepository The repository for online games.
+     * @param gamePlayController        The game player controller to notify players.
      */
     public MatchmakingMonitor(MatchmakingRepository matchmakingRepository,
-                              LiveGameRepository liveGameRepository, OnlineChessGameRepository onlineChessGameRepository) {
+                              LiveGameRepository liveGameRepository,
+                              OnlineChessGameRepository onlineChessGameRepository,
+                              GamePlayController gamePlayController) {
         this.matchmakingRepository = matchmakingRepository;
         this.liveGameRepository = liveGameRepository;
         this.onlineChessGameRepository = onlineChessGameRepository;
+        this.gamePlayController = gamePlayController;
     }
+
+    /**
+     * Adds a new game to the matchmaking system with the provided details.
+     *
+     * @param user1           The first user initiating the game.
+     * @param player1Ip       The IP address of the first player.
+     * @param player2UserName The username of the second player.
+     * @param player2IP       The IP address of the second player.
+     * @param player2Token    The token of the second player.
+     * @return The ID of the created game or FAILED_TO_CREATE_GAME if unsuccessful.
+     */
+    public synchronized int addToMatchmaking(GameUser user1, String player1Ip, String player2UserName,
+                                             String player2IP, String player2Token) {
+        // Create a new OnlineChessGame object with the provided user and player details
+        OnlineChessGame chessGame = new OnlineChessGame(user1.getToken(), player2Token,
+                user1.getUserName(), player2UserName);
+        // Set the IP addresses of the players
+        chessGame.setWhitePlayerIP(player1Ip);
+        chessGame.setBlackPlayerIP(player2IP);
+
+        // Save the chess game to the repository
+        onlineChessGameRepository.save(chessGame);
+        // Add the game to the live game repository
+        liveGameRepository.addGame(chessGame);
+
+        // Try to notify the other player that the challenge has been accepted
+        try {
+            gamePlayController.challengeAccepted(player2IP, player2Token, chessGame.getGameID());
+        } catch (Exception e) {
+            // If an exception occurs, delete the game from both repositories
+            liveGameRepository.deleteByID(chessGame.getGameID());
+            onlineChessGameRepository.deleteById(chessGame.getGameID());
+            return FAILED_TO_CREATE_GAME;
+        }
+        return chessGame.getGameID();
+    }
+
 
     /**
      * Finds an online match for the given game user within a specified time limit.
@@ -135,7 +179,7 @@ public class MatchmakingMonitor {
             OnlineChessGame newGame = matchmaking.getNewGame();
             newGame.setWhitePlayerIP(userIP);
             onlineChessGameRepository.save(newGame);
-            liveGameRepository.createNewGame(newGame);
+            liveGameRepository.addGame(newGame);
             return newGame.getGameID();
         } finally {
             // Decrement the current matchmaking count and notify all waiting threads
@@ -143,4 +187,6 @@ public class MatchmakingMonitor {
             notifyAll();
         }
     }
+
+
 }

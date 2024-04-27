@@ -17,11 +17,11 @@ public class LiveGameRepository {
     private final LinkedList<OnlineChessGame> liveGameList = new LinkedList<>();
 
     /**
-     * Creates a new game and adds it to the repository.
+     * Adds new game to the repository.
      *
      * @param newGame The new game to be created.
      */
-    public void createNewGame(OnlineChessGame newGame) {
+    public void addGame(OnlineChessGame newGame) {
         liveGameList.add(newGame);
     }
 

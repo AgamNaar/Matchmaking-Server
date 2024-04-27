@@ -1,6 +1,7 @@
 package com.onlinechessgame;
 
 import com.chessgame.ChessGame;
+import com.gameuser.GameUser;
 import jakarta.persistence.*;
 
 /**
@@ -17,10 +18,16 @@ public class OnlineChessGame extends ChessGame {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "online_chess_game_id_sequence")
     private int gameID;
-    private final String whitePlayerToken;
-    private final String blackPlayerToken;
-    private final String whiteUserName;
-    private final String blackUserName;
+    @Transient
+    private String whitePlayerToken;
+    @Transient
+    private String blackPlayerToken;
+    private String whiteUserName;
+    private String blackUserName;
+    @Transient
+    private String blackPlayerIP;
+    @Transient
+    private String whitePlayerIP;
     private String winnerName;
 
     /**
@@ -69,4 +76,43 @@ public class OnlineChessGame extends ChessGame {
         return winnerName;
     }
 
+    public void setGameID(int gameID) {
+        this.gameID = gameID;
+    }
+
+    public void setWhitePlayerToken(String whitePlayerToken) {
+        this.whitePlayerToken = whitePlayerToken;
+    }
+
+    public void setBlackPlayerToken(String blackPlayerToken) {
+        this.blackPlayerToken = blackPlayerToken;
+    }
+
+    public void setWhiteUserName(String whiteUserName) {
+        this.whiteUserName = whiteUserName;
+    }
+
+    public void setBlackUserName(String blackUserName) {
+        this.blackUserName = blackUserName;
+    }
+
+    public void setBlackPlayerIP(String blackPlayerIP) {
+        this.blackPlayerIP = blackPlayerIP;
+    }
+
+    public void setWhitePlayerIP(String whitePlayerIP) {
+        this.whitePlayerIP = whitePlayerIP;
+    }
+
+    public String getBlackPlayerIP() {
+        return blackPlayerIP;
+    }
+
+    public String getWhitePlayerIP() {
+        return whitePlayerIP;
+    }
+
+    public boolean getPlayerColor(GameUser gameUser) {
+        return gameUser.getUserName().equals(whiteUserName);
+    }
 }
