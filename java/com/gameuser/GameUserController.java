@@ -60,13 +60,13 @@ public class GameUserController {
     }
 
     /**
-     * Retrieves the top four rated players.
+     * Retrieves the top five rated players.
      *
-     * @return A ServerResponse containing information about the top four rated players.
+     * @return A ServerResponse containing information about the top five rated players.
      */
-    @GetMapping(path = "/get-top4")
-    public ServerResponse getTopFourRatedPlayer() {
-        return gameUserService.getTopFourRatedPlayer();
+    @GetMapping(path = "/get-top5")
+    public ServerResponse getTopFiveRatedPlayer() {
+        return gameUserService.getTopFiveRatedPlayer();
     }
 
     /**

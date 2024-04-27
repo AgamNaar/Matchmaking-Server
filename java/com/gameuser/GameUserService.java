@@ -107,14 +107,14 @@ public class GameUserService {
     }
 
     /**
-     * Retrieves the top 4 players with the highest rating and returns them as a string representation
+     * Retrieves the top 5 players with the highest rating and returns them as a string representation
      * in the response.
      *
-     * @return A ServerResponse containing the string representation of the top 4 players
+     * @return A ServerResponse containing the string representation of the top 5 players
      */
-    public ServerResponse getTopFourRatedPlayer() {
+    public ServerResponse getTopFiveRatedPlayer() {
         // Returns the string representation in a ServerResponse with HTTP status OK
-        return new ServerResponse(String.valueOf(gameUserRepository.findTop4Players()), HttpStatus.OK);
+        return new ServerResponse(String.valueOf(gameUserRepository.findTop5Players()), HttpStatus.OK);
     }
 
     /**

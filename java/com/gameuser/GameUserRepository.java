@@ -32,6 +32,7 @@ public interface GameUserRepository extends JpaRepository<GameUser, String> {
      *
      * @return A list of the top 4 players
      */
-    @Query("SELECT u FROM GameUser u ORDER BY u.rating DESC LIMIT 4")
-    LinkedList<GameUser> findTop4Players();
+    @Query("SELECT u FROM GameUser u ORDER BY u.rating DESC LIMIT 5")
+    LinkedList<GameUser> findTop5Players();
+
 }
