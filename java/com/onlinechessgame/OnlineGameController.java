@@ -2,7 +2,7 @@ package com.onlinechessgame;
 
 import com.AuthenticationService;
 import com.ServerResponse;
-import com.chessgame.ChessMove;
+import com.example.chessfrontend.modulus.ChessMove;
 import com.gameuser.GameUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

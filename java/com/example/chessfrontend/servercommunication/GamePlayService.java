@@ -1,5 +1,7 @@
 package com.example.chessfrontend.servercommunication;
 
+import com.example.chessfrontend.modulus.ChessMove;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -17,7 +19,7 @@ public interface GamePlayService extends Remote {
      * @param move The chess move to be sent.
      * @throws RemoteException if there is a communication-related exception during the method invocation.
      */
-    void sendMove(String move) throws RemoteException;
+    void sendMove(ChessMove move) throws RemoteException;
 
     /**
      * Notifies the client that the enemy has resigned from the game.

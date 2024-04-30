@@ -1,12 +1,14 @@
-package com.chessgame;
+package com.example.chessfrontend.modulus;
+
+import java.io.*;
 
 /**
  * Represents a move of a piece on the chessboard.
  */
-public class ChessMove {
-    private final byte currentPieceSquare;
-    private final byte targetSquare;
-    private final char typeOfPieceToPromoteTo;
+public class ChessMove implements Serializable {
+    private byte currentPieceSquare;
+    private byte targetSquare;
+    private char typeOfPieceToPromoteTo;
 
     /**
      * Constructs a PieceMove object.
@@ -63,5 +65,32 @@ public class ChessMove {
 
     public char getTypeOfPieceToPromoteTo() {
         return typeOfPieceToPromoteTo;
+    }
+
+    /**
+     * Custom serialization using ObjectOutputStream.
+     *
+     * @param out ObjectOutputStream for serialization.
+     * @throws IOException If an I/O error occurs during serialization.
+     */
+    @Serial
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeByte(currentPieceSquare);
+        out.writeByte(targetSquare);
+        out.writeChar(typeOfPieceToPromoteTo);
+    }
+
+    /**
+     * Custom deserialization using ObjectInputStream.
+     *
+     * @param in ObjectInputStream for deserialization.
+     * @throws IOException            If an I/O error occurs during deserialization.
+     * @throws ClassNotFoundException If the class of a serialized object cannot be found.
+     */
+    @Serial
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        currentPieceSquare = in.readByte();
+        targetSquare = in.readByte();
+        typeOfPieceToPromoteTo = in.readChar();
     }
 }

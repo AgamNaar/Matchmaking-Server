@@ -1,6 +1,6 @@
 package com.example.chessfrontend.servercommunication;
 
-import com.chessgame.ChessMove;
+import com.example.chessfrontend.modulus.ChessMove;
 import com.gameuser.GameUser;
 import com.onlinechessgame.OnlineChessGame;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ public class GamePlayController {
             GamePlayService service = (GamePlayService) Naming.lookup(urlToSend);
 
             // Send the chess move to the remote service
-            service.sendMove(chessMove.toString());
+            service.sendMove(chessMove);
         } catch (Exception e) {
             e.printStackTrace();
         }

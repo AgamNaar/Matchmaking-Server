@@ -2,7 +2,7 @@ package com.onlinechessgame;
 
 import com.ServerResponse;
 import com.chessgame.ChessGame;
-import com.chessgame.ChessMove;
+import com.example.chessfrontend.modulus.ChessMove;
 import com.example.chessfrontend.servercommunication.GamePlayController;
 import com.gameuser.GameUser;
 import com.gameuser.GameUserRepository;

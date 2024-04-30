@@ -1,8 +1,8 @@
 package com.chessgame.gamelogic;
 
 import com.chessgame.ChessGame;
-import com.chessgame.ChessMove;
 import com.chessgame.gamelogic.pieces.Piece;
+import com.example.chessfrontend.modulus.ChessMove;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
